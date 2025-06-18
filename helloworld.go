@@ -4,10 +4,18 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"math/cmplx"
 )
 
 // Package level variables
 var python, java, rust bool
+
+// Factored variable declaration and different types
+var (
+	ToBe bool = false
+	MaxInt uint64 = 1<<64 - 1
+	z complex128 = cmplx.Sqrt(-5 + 12i)
+)
 
 // Be aware of the argument's structure.
 func add(x int, y int) int {
@@ -48,5 +56,10 @@ func main() {
 	foo2 := 18
 	fmt.Print(foo1, foo2, python, java, rust)
 
+	var zero int
+    var i int = 42
+    var f float64 = float64(i)
+    var u uint = uint(f)
+	fmt.Println(add(zero, int(u)))
 }
 

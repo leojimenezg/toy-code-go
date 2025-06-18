@@ -38,4 +38,38 @@ Para declarar las variables se utiliza la palabra reservada *var*, la cual, decl
 
 La declaración con *var* puede ser usada en varios niveles (scope), ya sea a nivel de paquete o de función, y puede incluir inicializadores, uno por variable. Cuando estos se presentan en la declaración, el especificador del tipo puede ser omitido, y la variable tomará el valor de ese inicializador.
 
-Además, se puede usar el operador *:=* dentro de un scope de función para reemplazar la declaración de *var* y utilizar de forma implícita el tipo de valor. Sin embargo, es importante considerar que fuera del scope de funciones, es decir, a nivel de paquete todas las declaraciones deben iniciar con alguna palabra clave, por lo que el uso de este operador a nivel de paquete no es posible.
+Además, se puede usar el operador *:=* dentro de un scope de función para reemplazar la declaración de *var* y utilizar de forma implícita el tipo del valor asignado (derecha). Sin embargo, es importante considerar que fuera del scope de funciones, es decir, a nivel de paquete todas las declaraciones deben iniciar con alguna palabra clave, por lo que el uso de este operador a nivel de paquete no es posible.
+
+### Zero Values
+A las variables que son declaradas sin un valor inicial explícito se les asigna un *zero value*, es decir, una valor default que depende del tipo:
+* Numeric Type: 0
+* Boolean Type: false
+* String Type: ""
+
+### Basic Types
+Go tiene los siguientes tipos de datos, representados en categorías:
+* Boolean: bool
+* String: string
+* Numeric: int, int8, int16, int32, int64
+* Unsigned Numeric: uint, uint8, uint16, uint32, uint64, uintptr
+* Byte: byte == uint8
+* Rune: rune == int32
+* Float: float32, float64
+* Complex: complex64, complex128
+
+Generalmente, los tipos que no tienen un tamaño especificado, como *int*, *unit* o *uintptr* dependen del Sistema Operativo, ya sea que su tamaño sea de 32-bit o 64-bit.
+
+Go recomienda usar *int* cuando se requiera utilizar un valor numérico (integer), a menos que haya razonez específicas para usar otro tipo.
+
+### Type Conversion
+Para convertir un tipo a otro tipo se utiliza la expresión *T(v)*, donde *v* es el valor a convertir y *T* es el tipo al que se va a convertir.
+* Ejemplo:
+    ```Go
+    var i int = 42
+    var f float64 = float64(i)
+    var u uint = uint(f)
+    ```
+
+A diferencia de C, la asignación de items de diferentes tipos en Go requiere explícitamente la conversión de los tipos. Por lo tanto, es evidente que el casteo no se hace automáticamente como en C.
+
+
