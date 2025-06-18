@@ -6,6 +6,9 @@ import (
 	"math/rand"
 )
 
+// Package level variables
+var python, java, rust bool
+
 // Be aware of the argument's structure.
 func add(x int, y int) int {
 	return x + y
@@ -31,10 +34,19 @@ func split(sum int) (x, y int) {
 // Package entry point.
 func main() {
 	fmt.Println("Random number:", rand.Intn(10))
+
 	fmt.Print("Add of two numbers: ", add(rand.Intn(10), rand.Intn(10)), "\n")
 	fmt.Print("Subtract of two numbers: ", subtract(rand.Intn(10), rand.Intn(10)), "\n")
+
 	a, b := swap("Hello", "World")
 	fmt.Println("Swaped values:", a, b)
+
 	fmt.Printf("Split values: ")
 	fmt.Println(split(17))
+
+	var foo1 int = 15
+	foo2 := 18
+	fmt.Print(foo1, foo2, python, java, rust)
+
 }
+
