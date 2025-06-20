@@ -39,6 +39,27 @@ func split(sum int) (x, y int) {
 	return // Naked return, only recommended for short functions.
 }
 
+func Sqrt(x float64) float64 {
+	if x == 0 {
+		return 0
+	}
+	var z float64 = 1.0
+	for i := 0; i < 10; i++ {
+		z -= (z*z - x) / (2*z)
+	}
+	return z
+}
+
+// defer functions use a LIFO order stack
+func count() int {
+	fmt.Println("Counting: ")
+	defer fmt.Println("Done!") // First In - Last Out
+	for i := 0; i < 10; i++ {
+		defer fmt.Println(i) // i == 9 Last In - First Out
+	}
+	return 0 
+}
+
 // Package entry point.
 func main() {
 	fmt.Println("Random number:", rand.Intn(10))
@@ -54,12 +75,35 @@ func main() {
 
 	var foo1 int = 15
 	foo2 := 18
-	fmt.Print(foo1, foo2, python, java, rust)
+	fmt.Println(foo1, foo2, python, java, rust)
 
 	var zero int
-    var i int = 42
-    var f float64 = float64(i)
-    var u uint = uint(f)
+	var i int = 42
+	var f float64 = float64(i)
+	var u uint = uint(f)
 	fmt.Println(add(zero, int(u)))
-}
 
+	// Normal for loop
+	for i:= 0; i < 10; i++ {
+		fmt.Println("Iteration:", i)
+	}
+
+	// Continued foop loop
+	sum := 1
+	for ; sum < 1000; {
+		sum += sum
+	}
+
+	// While (for) loop
+	while := 0
+	for while < 500 {
+		while += 100
+	}
+
+	/* Forever loop
+	for {
+	}
+	*/
+
+	count()
+}
