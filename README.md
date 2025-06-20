@@ -105,3 +105,4 @@ Hay dos consideraciones importantes al momento de usar un *switch* son que: el v
 ### Defer
 Una declaración *defer* hace que la ejecución de una función sea realizada inmediatamente antes de que la función que las rodea finalice, o en su defecto, retorne un valor. Además, este tipo de funciones utiliza un stack especial y utiliza el orden LIFO (Last In - First Out), lo que es crucial para entender su funcionamiento y orden de ejecución.
 
+### Pointers
