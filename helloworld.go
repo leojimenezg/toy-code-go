@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"math/cmplx"
+	"runtime"
 )
 
 // Package level variables
@@ -104,6 +105,18 @@ func main() {
 	for {
 	}
 	*/
+
+	var os string = runtime.GOOS // Operating System
+	switch os {
+	case "darwin":
+		fmt.Println("MacOS power")
+	case "linux":
+		fmt.Println("Linux power")
+	case "windows":
+		fmt.Println("Fuck windows")
+	default:
+		fmt.Printf("%s power\n", os)
+	}
 
 	count()
 }
