@@ -61,6 +61,11 @@ func count() int {
 	return 0 
 }
 
+type T struct {
+	X, Y, Z int
+	a, b, c string
+}
+
 // Package entry point.
 func main() {
 	fmt.Println("Random number:", rand.Intn(10))
@@ -119,4 +124,21 @@ func main() {
 	}
 
 	count()
+
+	var x int = 42
+	var p *int = &x
+	fmt.Println("x value from pointer:", *p)
+
+	var v1 T = T{ 1, 2, 3, "a", "b", "c" }
+	fmt.Println("Struct v1:", v1)
+	var v2 T = T{ Z: 1, Y: 2, X: 3, c: "a", b: "b", a: "c"}
+	fmt.Println("Struct v2:", v2)
+	var v3 T = T{}
+	fmt.Println("Struct v3:", v3)
+
+	var array1 [3]int
+	array1[0], array1[1], array1[2] = 1, 2, 3
+	fmt.Println("Array 1:", array1)
+	array2 := [3]int{ 4, 5, 6}
+	fmt.Println("Array 2:", array2)
 }

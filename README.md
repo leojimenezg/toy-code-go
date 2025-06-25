@@ -34,13 +34,13 @@ Como ya se mencionó, las funciones pueden retornar múltiples valores, siempre 
 Cuando los valores de retorno son nombrados, son tratados como si fueran variables definidas al inicio de la función.
 
 ### Variables
-Para declarar las variables se utiliza la palabra reservada *var*, la cual, declara una lista de variables, y se puede usar la misma sintaxis de los argumentos de una función. Es decir, poner el tipo de variable al final, y si son varias del mismo tipo, solo ponerlo al final.
+Para declarar las variables se utiliza la palabra reservada `var`, la cual, declara una lista de variables, y se puede usar la misma sintaxis de los argumentos de una función. Es decir, poner el tipo de variable al final, y si son varias del mismo tipo, solo ponerlo al final.
 
 La declaración con `var` puede ser usada en varios niveles (scope), ya sea a nivel de paquete o de función, y puede incluir inicializadores, uno por variable. Cuando estos se presentan en la declaración, el especificador del tipo puede ser omitido, y la variable tomará el valor de ese inicializador.
 
 Además, se puede usar el operador `:=` dentro de un scope de función para reemplazar la declaración de `var` y utilizar de forma implícita el tipo del valor asignado (derecha). Sin embargo, es importante considerar que fuera del scope de funciones, es decir, a nivel de paquete todas las declaraciones deben iniciar con alguna palabra reservada, por lo que el uso de este operador a nivel de paquete no es posible.
 
-### Zero Values
+### Zero Value
 A las variables que son declaradas sin un valor inicial explícito se les asigna un *zero value*, es decir, una valor default que depende del tipo:
 * Numeric Type: `0`
 * Boolean Type: `false`
@@ -106,3 +106,60 @@ Hay dos consideraciones importantes al momento de usar un `switch` son que: el v
 Una declaración `defer` hace que la ejecución de una función sea realizada inmediatamente antes de que la función que las rodea finalice, o en su defecto, retorne un valor. Además, este tipo de funciones utiliza un stack especial y utiliza el orden `LIFO` (Last In - First Out), lo que es crucial para entender su funcionamiento y orden de ejecución.
 
 ### Pointers
+Los punteros almacenan la dirección de memoria de un valor. Es decir, que un puntero apunta a la dirección de memoria donde es almacenado un valor, pero no apunta directamente al valor. Cabe resaltar que a diferencia de C, Go no tiene aritmética de punteros.
+
+Para trabajar con punteros hay dos operadores clave:
+* `*`: Este operador indica que una variable es un puntero de cierto tipo. Por ejemplo:
+    ```Go
+    var p *int // Donde "p" apunta a una dirección de memoria que almacena un valor de tipo "int".
+    ```
+* `&`: Este operador obtiene la dirección de memoria de una variable. Por ejemplo:
+    ```Go
+    var i int = 42
+    p = &i // Donde "&i" genera la dirección de memoria de i.
+    ```
+* Al trabajar con punteros, se pueden trabajar con dos valores diferentes, de distinta forma.
+    * Si se quiere usar la dirección a la que apunta, se usa `p` (nombre del puntero).
+    * SI se quiere usar el valor de la dirección de memoria a la que apunta, se usa `*p` (el signo `*` y el nombre del puntero).
+
+### Structs
+Una estructura es una colección de `fields` o *miembros*. Para acceder a los miembros de una estructura de usa la notación de punto `.` y el nombre exacto del miembro. Ejemplo:
+```Go
+type T struct {
+    X int
+    Y int
+}
+var t1 T = T{ 1, 2 }
+```
+
+Los punteros que almacenan la dirección de memoria de una estructura se comportan de manera un poco diferente. Pues, normalmente, para acceder a los miembros de una estructura mediante un puntero se utilizaría la expresión `(*p).X`, sin embargo, Go permite una expresión más sencilla `p.X`. Esto es posible ya que una estructura es la dirección de memoria base del bloque donde se almacenan todos sus miembros, y para acceder a ellos se utilizan offsets basados en el tipo de dato del miembro y del padding agregado por el compilador. Ejemplo:
+```Go
+(*p).X = 3 // Original form
+p.Y = 4    // Simplier form
+```
+
+Al crear una variable de un tipo que es una estructura, se pueden dar tres casos:
+* Se pueden especificar los valores de uno o más miembros de una estructura de forma posicional, es decir, que los valores serán asignados dependiendo del orden de declaración de los miembros. Ejemplo:
+```Go
+v1 := T{ 5, 6 } // X = 5, y Y = 6
+```
+* Se pueden especificar los valores de uno o más miembros de una estructura usando sus nombres, lo que resulta más claro y en algunos casos, más conveniente. Ejemplo:
+```Go
+v2 := T{ X: 7, Y: 8 } // X = 7, y Y = 8. Se le llama string literals.
+```
+* Si no se especifican los valores de uno o más miembros de una estructura, a dichos miembros se les asignará su *zero value*. Ejemplo:
+```Go
+v3 := T{} // X = 0, y Y = 0
+```
+* **Nota**: No se pueden combinar los dos primeros casos para asignar valores usando su posición y su nombre.
+
+### Arrays
+Los arreglos en Go funcionan de forma completamente diferente a los arreglos en C. Pues en C, un array siempre se utiliza por referencia, es decir, por su dirección de memoria; mientras que en Go, un array simpre se utiliza por valor, por lo que siempre se apunta a todos los valores del array en lugar de su dirección base.
+
+Entonces, para declarar un array se utiliza la expresión `[n]T`, donde `n` es la cantidad de elementos del array, y `T` es el tipo de valor de los elementos. El tamaño del arreglo es parte de su tipo, por lo que son de tamaño fijo. Ejemplo:
+```Go
+var a1 [2]int // Array de dos elementos de tipo entero
+a[0], a[1] = 3, 4
+```
+
+### Slices
