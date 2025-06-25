@@ -40,7 +40,7 @@ La declaración con `var` puede ser usada en varios niveles (scope), ya sea a ni
 
 Además, se puede usar el operador `:=` dentro de un scope de función para reemplazar la declaración de `var` y utilizar de forma implícita el tipo del valor asignado (derecha). Sin embargo, es importante considerar que fuera del scope de funciones, es decir, a nivel de paquete todas las declaraciones deben iniciar con alguna palabra reservada, por lo que el uso de este operador a nivel de paquete no es posible.
 
-### Zero Value
+### Zero Values
 A las variables que son declaradas sin un valor inicial explícito se les asigna un *zero value*, es decir, una valor default que depende del tipo:
 * Numeric Type: `0`
 * Boolean Type: `false`
@@ -140,17 +140,17 @@ p.Y = 4    // Simplier form
 
 Al crear una variable de un tipo que es una estructura, se pueden dar tres casos:
 * Se pueden especificar los valores de uno o más miembros de una estructura de forma posicional, es decir, que los valores serán asignados dependiendo del orden de declaración de los miembros. Ejemplo:
-```Go
-v1 := T{ 5, 6 } // X = 5, y Y = 6
-```
+    ```Go
+    v1 := T{ 5, 6 } // X = 5, y Y = 6
+    ```
 * Se pueden especificar los valores de uno o más miembros de una estructura usando sus nombres, lo que resulta más claro y en algunos casos, más conveniente. Ejemplo:
-```Go
-v2 := T{ X: 7, Y: 8 } // X = 7, y Y = 8. Se le llama string literals.
-```
+    ```Go
+    v2 := T{ X: 7, Y: 8 } // X = 7, y Y = 8. Se le llama string literals.
+    ```
 * Si no se especifican los valores de uno o más miembros de una estructura, a dichos miembros se les asignará su *zero value*. Ejemplo:
-```Go
-v3 := T{} // X = 0, y Y = 0
-```
+    ```Go
+    v3 := T{} // X = 0, y Y = 0
+    ```
 * **Nota**: No se pueden combinar los dos primeros casos para asignar valores usando su posición y su nombre.
 
 ### Arrays
