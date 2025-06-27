@@ -3,6 +3,7 @@ package main
 // This kind of import is called "factored" import statement.
 import (
 	"fmt"
+	"strings"
 	"math/rand"
 	"math/cmplx"
 	"runtime"
@@ -136,9 +137,53 @@ func main() {
 	var v3 T = T{}
 	fmt.Println("Struct v3:", v3)
 
-	var array1 [3]int
+	var array1 [6]int
 	array1[0], array1[1], array1[2] = 1, 2, 3
+	array1[3], array1[4], array1[5] = 7, 8, 9
 	fmt.Println("Array 1:", array1)
+
 	array2 := [3]int{ 4, 5, 6}
 	fmt.Println("Array 2:", array2)
+
+	var slice1 []int = array1[0:3]
+	fmt.Println("Slice1 from Array1:", slice1)
+
+	/*
+	The difference between a something literal or not is in the use of values:
+	something not literal: var numbers [4]int
+	something literal: var numbers [4]int = [4]int{1, 2, 3, 4}
+	*/
+
+	// This array literal contains all the elements of the array.
+	array_literal := [4]bool{true, false, false, true}
+	fmt.Println("Array literal:", array_literal)
+	// This slice literal creates the array and uses its reference.
+	slice_literal := []bool{true, false, false, true}
+	fmt.Println("Slice literal:", slice_literal)
+
+	var empty []int
+	if empty == nil {
+		fmt.Println("Empty slice!")
+	}
+
+	// Slice of slices
+	board := [][]string {
+		{"_", "_", "_"},
+		{"_", "_", "_"},
+		{"_", "_", "_"},
+	}
+	board[0][0] = "X"
+	board[1][1] = "X"
+	board[2][2] = "X"
+	fmt.Println("Slice of slices:")
+	for i:= 0; i < len(board); i++ {
+		fmt.Printf("%s\n", strings.Join(board[i], " "))
+	}
+
+	var s []int
+	fmt.Println(s)
+	s = append(s, 0, 1)
+	fmt.Println(s)
+	s = append(s, 2, 3, 4)
+	fmt.Println(s)
 }

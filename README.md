@@ -163,3 +163,31 @@ a[0], a[1] = 3, 4
 ```
 
 ### Slices
+Un slice tiene tamaño dinámico y es una forma flexible de acceder a los elementos de un array. Un slice es formado al especificar dos índices: `low bound` y `high bound` separados por `:`. Por defecto, el zero value de `low bound` es `0`, y el del `high boud` es la longitud del array. Ejemplo:
+```Go
+array := [6]int{1, 2, 3, 4, 5, 6}
+var s []int = array[1:4]
+// Slice de 3 elementos, donde se incluye el low bound (1) pero no el high bound (4).
+```
+
+A diferencia de un array, un slice no almacena realmente los valores, sino que describe una sección de un array existente o completo, es decir, que trabaja con la referencia de un array. Por lo tanto, como un slice trabaja con la referencia de un array, al modificar el slice, el arreglo y otros slices dependientes cambian de igual forma.
+
+Cualquier slice tiene dos características fundamentales:
+* `length`: La longitud es el número de elementos que contiene el slice. Se usa la expresión `len()` para obtener la longitud.
+* `capacity`: La capacidad es el número de elementos que contiene el array contando desde el primer elemento del que parte el slice. Se usa la expresión `cap()` para obtener la capacidad.
+
+El zero value de un slice es `nil`, y un slice vacío tiene una longitud y capacidad de 0, por lo que no existe un array del cual partir.
+
+Otra forma de crear slices es con la función integrada `make()`, pues esta se encarga de alojar un array del tamaño especificado, llenarlo de ceros y devolver un slice que apunta al array creado. Ejemplo:
+```Go
+a := make([]int, 0, 5)
+// Esto crea un slice de elementos int, con longitud de 0 y capacidad de 5
+```
+
+Go integra la función `append()` para agregar nuevos elementos a un slice. Esta función recibe el slice al cual se le van a agregar los elementos, y recibe los elementos a agregar. El resultado de esta función es un slice que contiene los elementos originales más los nuevos elementos agregados; si la capacidad del array no puede soportar los nuevos elementos, se crea uno nuevo para poder almacenar todos los elementos y se utiliza ese nuevo array. Ejemplo:
+```Go
+var s []int
+s = append(s, 0, 1)
+s = append(s, 2, 3, 4)
+```
+
