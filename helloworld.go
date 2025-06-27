@@ -180,10 +180,13 @@ func main() {
 		fmt.Printf("%s\n", strings.Join(board[i], " "))
 	}
 
-	var s []int
-	fmt.Println(s)
+	var s []int = make([]int, 0, 4)
+	fmt.Printf("Elements: %v, length: %d, capacity: %d\n", s, len(s), cap(s))
 	s = append(s, 0, 1)
-	fmt.Println(s)
-	s = append(s, 2, 3, 4)
-	fmt.Println(s)
+	fmt.Printf("Elements: %v, length: %d, capacity: %d\n", s, len(s), cap(s))
+	s = append(s, 2, 3)
+	fmt.Printf("Elements: %v, length: %d, capacity: %d\n", s, len(s), cap(s))
+	s = append(s, 4, 5)
+	fmt.Printf("Elements: %v, length: %d, capacity: %d\n", s, len(s), cap(s))
+	// When the length of a slice is greater than the slice capacity, a new array generally with doubled the original capacity is created.
 }
