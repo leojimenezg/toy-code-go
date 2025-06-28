@@ -191,3 +191,9 @@ s = append(s, 0, 1)
 s = append(s, 2, 3, 4)
 ```
 
+### Range
+Utilizar `range` es una forma corta de recorrer los elementos de un array, slice o map, incluso de recorrer un rango numérico. Cuando se utiliza para recorrer algún objeto iterable, se obtienen dos valores: primero, el index del elemento, y segundo, una copia del elemento.
+
+Alguno de los dos valores que se obtienen de usar `range` puede ser ignorado usando `_` o simplemente omitiendo la variable donde se almacenaría dicho elemento.
+
+### Maps

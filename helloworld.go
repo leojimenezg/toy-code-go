@@ -56,7 +56,7 @@ func Sqrt(x float64) float64 {
 func count() int {
 	fmt.Println("Counting: ")
 	defer fmt.Println("Done!") // First In - Last Out
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		defer fmt.Println(i) // i == 9 Last In - First Out
 	}
 	return 0 
@@ -189,4 +189,9 @@ func main() {
 	s = append(s, 4, 5)
 	fmt.Printf("Elements: %v, length: %d, capacity: %d\n", s, len(s), cap(s))
 	// When the length of a slice is greater than the slice capacity, a new array generally with doubled the original capacity is created.
+
+	var pow = [8]int{1, 2, 4, 8, 16, 32, 64, 128}
+	for index, value := range pow {
+		fmt.Printf("2^%d = %d\n", index, value)
+	}
 }
