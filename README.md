@@ -20,21 +20,26 @@ En Go, un nombre contenido en un paquete, ya sea de una función, constante, etc
 ### Functions
 Las funciones pueden tomar cero o más argumentos, y su funcionamiento es lo usual. Sin embargo, es importante tener en cuenta que en los argumentos, primero se pone el nombre del argumento y luego el tipo de dato, contrario a lo usual.
 
-De acuerdo al artículo del blog de Go [Go's Declaration Syntax](https://go.dev/blog/declaration-syntax), estas son las razones por las que su sintaxis es diferente a la de los lenguajes de la familia C:
-* La sintaxis de los lenguajes de la familia C para la declaración de identificadores, como variables o funciones, **envuelve** el nombre de los items, pues el especificador de tipo está a la izquierda del nombre y otras características o valores están a su derecha. Esto, si bien es una forma inusual (aparentemente) e inteligente, en algunos casos, esta forma hacer que la legibilidad del código se dificulte bastante.
-* La sintaxis de declaración en Go, toman la idea base donde los nombres están primero (izquierda) y sus especificadores de tipo después (derecha). Por lo tanto, con esta idea base, la legibilidad left-to-right se vuelve muy sencilla y se da naturalmente, en comparación con C, que envuelve el nombre y se vuelve difícil de leer.
-* Por otro lado, los punteros son un punto de excepción, pues no puedieron hacer esa reversión de sintaxis, por lo que estos funcionan como lo hacen en C: con la notación * y siendo usados antes del nombre del puntero.
+De acuerdo al artículo del blog de Go [Go's Declaration Syntax](https://go.dev/blog/declaration-syntax), estas son las razones por las que su sintáxis es diferente a la de los lenguajes de la familia C:
+* La sintáxis de los lenguajes de la familia C para la declaración de identificadores, como variables o funciones, **envuelve** el nombre de los items, pues el especificador de tipo está a la izquierda del nombre y otras características o valores están a su derecha. Esto, si bien es una forma inusual (aparentemente) e inteligente, en algunos casos, esta forma hacer que la legibilidad del código se dificulte bastante.
+* La sintáxis de declaración en Go, toma la idea base donde los nombres están primero (izquierda) y sus especificadores de tipo después (derecha). Por lo tanto, con esta idea base, la legibilidad **left-to-right** se vuelve muy sencilla y se da naturalmente, en comparación con C, que envuelve el nombre y se vuelve difícil de leer.
+* Por otro lado, los punteros son un punto de excepción, pues no puedieron hacer esa reversión de sintáxis, por lo que estos funcionan como lo hacen en C: con la notación `*` y siendo usados antes del nombre del puntero.
     * Ejemplo:
         ```Go
         var p *int
         x = *p
         ```
 
-Como ya se mencionó, las funciones pueden retornar múltiples valores, siempre y cuando se declaren dentro de paréntesis (). Estos valoes pueden obtener su significado posicionalmente o mediante un nombre.
-Cuando los valores de retorno son nombrados, son tratados como si fueran variables definidas al inicio de la función.
+Como ya se mencionó, las funciones pueden retornar múltiples valores, siempre y cuando se declaren dentro de paréntesis `()`. Estos valores pueden obtener su significado posicionalmente o mediante un nombre. Cuando los valores de retorno son nombrados, son tratados como si fueran variables definidas al inicio de la función.
+
+#### Function values
+Las funciones también son valores, como cualquier otro valor (int, string, array, etc), por lo que pueden ser usados como cualquier otro valor, por ejemplo, como argumentos de otras funciones o como valores de retorno de funciones.
+
+#### Function closure
+Además, las functiones pueden ser `closures` de otras funciones, es decir, que pueden actuar como funciones anónimas que utilizan variables fuera de su alcance (función padre) y que son regresadas por su función padre. Esto provoca que el estado de las variables utilizadas dentro del *closure* que pertenecen a la función padre mantengan su estado hasta que esa *function closure* ya no se use más.
 
 ### Variables
-Para declarar las variables se utiliza la palabra reservada `var`, la cual, declara una lista de variables, y se puede usar la misma sintaxis de los argumentos de una función. Es decir, poner el tipo de variable al final, y si son varias del mismo tipo, solo ponerlo al final.
+Para declarar las variables se utiliza la palabra reservada `var`, la cual, declara una lista de variables, y se puede usar la misma sintáxis de los argumentos de una función. Es decir, poner el tipo de variable al final, y si son varias del mismo tipo, solo ponerlo al final.
 
 La declaración con `var` puede ser usada en varios niveles (scope), ya sea a nivel de paquete o de función, y puede incluir inicializadores, uno por variable. Cuando estos se presentan en la declaración, el especificador del tipo puede ser omitido, y la variable tomará el valor de ese inicializador.
 
@@ -192,8 +197,37 @@ s = append(s, 2, 3, 4)
 ```
 
 ### Range
-Utilizar `range` es una forma corta de recorrer los elementos de un array, slice o map, incluso de recorrer un rango numérico. Cuando se utiliza para recorrer algún objeto iterable, se obtienen dos valores: primero, el index del elemento, y segundo, una copia del elemento.
+Utilizar `range` es una forma corta de recorrer los elementos de un array, slice o map, incluso de recorrer un rango numérico. Cuando se utiliza para recorrer algún objeto iterable, se obtienen dos valores: primero, el index o llave del elemento, y segundo, una copia del elemento.
 
 Alguno de los dos valores que se obtienen de usar `range` puede ser ignorado usando `_` o simplemente omitiendo la variable donde se almacenaría dicho elemento.
 
 ### Maps
+Un `map` es básicamente un arreglo de valores que son accedidos mediante llaves en lugar de índicies, por lo que toman la forma de `key-value`.
+
+El *zero value* de un mapa en `nil`, y cuando un mapa que tiene este valor no tiene ninguna llave y no se le pueden agregar nuevas llaves. Sin embargo, se puede utilizar la función `make`, similar a su uso en slices, pues esta función devuelve un mapa de cierto tipo inicializado y listo para ser usado.
+
+Se pueden realizar varias operaciones con los mapas, como:
+* Insertar o Actualizar un elemento del mapa:
+    ```Go
+    m["Answer"] = 42
+    // Si la llave "Answer" existe, actualiza el valor.
+    // Si la llave "Answer" no existe, crea la llave y asigna el valor.
+    ```
+* Obtener un elemento del mapa:
+    ```Go
+    value = m["Answer"]
+    // Regresa el valor correspondiente a la llave "Answer".
+    ```
+* Eliminar un elemento del mapa:
+    ```Go
+    delete(m, "Answer")
+    // delete(mapa, llave)
+    ```
+* Verificar que una llave exista en el mapa:
+    ```Go
+    value, ok := m["Answer"]
+    // Si existe, regresa el valor y la segunda variable (ok) es true.
+    // Si no existe, regresa el zero value y la segunda variable es false.
+    ```
+
+## Methods and interfaces

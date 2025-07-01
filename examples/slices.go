@@ -1,4 +1,4 @@
-package slices1
+package slices
 
 // URL: https://go.dev/tour/moretypes/18
 import "golang.org/x/tour/pic"

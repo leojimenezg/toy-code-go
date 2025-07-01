@@ -194,4 +194,20 @@ func main() {
 	for index, value := range pow {
 		fmt.Printf("2^%d = %d\n", index, value)
 	}
+
+	var map1 map[string]int = make(map[string]int)
+	map1["items"] = 3
+	map1["price"] = 2
+	map1["day"] = 13
+	fmt.Println("Map1:", map1)
+
+	// Map literals
+	map2 := map[string]string {
+		"name": "Mike",
+		"lastname": "Thompson",
+		"user": "mitho12",
+	}
+	fmt.Println("Map2:", map2)
+	delete(map2, "user")
+	fmt.Println("Map2:", map2)
 }
