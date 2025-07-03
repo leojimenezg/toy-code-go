@@ -67,6 +67,19 @@ type T struct {
 	a, b, c string
 }
 
+type P struct {
+	p1, p2 float32
+}
+
+func (p P) Sum() float32 {
+	return p.p1 + p.p2
+}
+
+func (p *P) Scale(f float32) {
+	p.p1 = p.p1 * f
+	p.p2 = p.p2 * f
+}
+
 // Package entry point.
 func main() {
 	fmt.Println("Random number:", rand.Intn(10))
@@ -210,4 +223,10 @@ func main() {
 	fmt.Println("Map2:", map2)
 	delete(map2, "user")
 	fmt.Println("Map2:", map2)
+
+	p1 := P{3, 7}
+	fmt.Println("P1 normal:", p1)
+	fmt.Println("P1 sum:", p1.Sum())
+	p1.Scale(5)
+	fmt.Println("P1 scaled:", p1)
 }

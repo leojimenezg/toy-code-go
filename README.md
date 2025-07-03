@@ -231,3 +231,22 @@ Se pueden realizar varias operaciones con los mapas, como:
     ```
 
 ## Methods and interfaces
+### Methods
+Go no tiene POO y por lo tanto, no tiene clases ni objetos. Sin embargo, es posible agregar métodos a los `types`, pues un método es básicamente una función pero con un `receiver argument` especial que aparece después de la keyword `func` pero antes del nombre del método. Dicho `receiver argument` asocia el método con el tipo de ese argumento, es decir, especifica qué `type` posee el método declarado. Ejemplo:
+```Go
+type Struct1 struct {
+    X, Y float64
+}
+func (s1 Struct1) Sum() float64 {
+    return s1.X + s1.Y
+}
+```
+
+Los métodos pueden ser declarados con cualquier `type`, siempre y cuando el `type` se encuentre definido en el mismo paquete donde se declara el método; y que no sea un `type` predefinido por el lenguaje.
+
+Entonces, básicamente un método es una función que recibe un objeto de un tipo especificado y dicho método es asociado al tipo del objeto recibido, no al objeto como tal. Existen dos formas por las que un método puede recibir el objeto de cierto tipo:
+* `Value receiver`: Cuando se recibe un objeto por valor, se está recibiendo una copia del objeto. Por lo tanto, nunca se puede trabajar ni modificar el objeto real.
+* `Pointer receiver`: Cuando se recibe un objeto por referencia o puntero, se está recibiendo la dirección de memoria del objeto real. Por lo tanto, se trabaja con el objeto real y cualquier modificación será visible en otras partes que usen el mismo objeto.
+* **Nota: Un método debe usar o value receivers o pointer receivers, pero no se deben combinar.**
+
+## Interfaces
