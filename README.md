@@ -249,4 +249,4 @@ Entonces, básicamente un método es una función que recibe un objeto de un tip
 * `Pointer receiver`: Cuando se recibe un objeto por referencia o puntero, se está recibiendo la dirección de memoria del objeto real. Por lo tanto, se trabaja con el objeto real y cualquier modificación será visible en otras partes que usen el mismo objeto.
 * **Nota: Un método debe usar o value receivers o pointer receivers, pero no se deben combinar.**
 
-## Interfaces
+### Interfaces
