@@ -80,6 +80,50 @@ func (p *P) Scale(f float32) {
 	p.p2 = p.p2 * f
 }
 
+const PI float64 = 3.14159
+
+// Interface type implement two methods.
+type Figure interface {
+	Perimeter() float64
+	Area() float64
+}
+
+type Circle struct {
+	r float64
+}
+
+type Rectangle struct {
+	w, h float64
+}
+
+// Circle type implements Figure interface.
+func (c *Circle) Perimeter() float64 {
+	if c == nil {
+		return 0
+	}
+	return 2 * PI * c.r
+}
+func (c *Circle) Area() float64 {
+	if c == nil {
+		return 0
+	}
+	return PI * c.r * c.r
+}
+
+// Rectangle type implements Figure interface
+func (r *Rectangle) Perimeter() float64 {
+	if r == nil {
+		return 0
+	}
+	return 2 * (r.w + r.h)
+}
+func (r *Rectangle) Area() float64 {
+	if r == nil {
+		return 0
+	}
+	return r.w * r.h
+}
+
 // Package entry point.
 func main() {
 	fmt.Println("Random number:", rand.Intn(10))
@@ -229,4 +273,18 @@ func main() {
 	fmt.Println("P1 sum:", p1.Sum())
 	p1.Scale(5)
 	fmt.Println("P1 scaled:", p1)
+
+	var Ifig Figure  // Figure interface type object
+	// Ifig = Circle{4}  // This causes error because there isn't a method with a value receiver.
+	Ifig = &Circle{4}
+	show_figure_info(Ifig)
+	Ifig = &Rectangle{w: 5, h:3}
+	show_figure_info(Ifig)
+
+}
+
+func show_figure_info(i Figure) {
+	fmt.Printf("Perimeter: %.2f, ", i.Perimeter())
+	fmt.Printf("Area: %.2f, ", i.Area())
+	fmt.Printf("(%v, %T)\n", i, i)
 }

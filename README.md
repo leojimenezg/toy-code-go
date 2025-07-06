@@ -250,3 +250,44 @@ Entonces, básicamente un método es una función que recibe un objeto de un tip
 * **Nota: Un método debe usar o value receivers o pointer receivers, pero no se deben combinar.**
 
 ### Interfaces
+Una interfaz es un objeto de tipo `interface` que define un conjunto de declaraciones de métodos. Es decir, que una interfaz es un contrato de métodos, y cualquier tipo que implemente los métodos definidos en la interfaz puede usar el tipo interfaz.
+
+Es importante mencionar que cualquier interfaz almacena información sobre el objeto asignado a una variable de tipo interfaz en forma de tupla, pues almacena el valor del objeto y el tipo del objeto para saber a qué método debe llamar: `(value, type)`.
+
+Básicamente, una interfaz establece un conjunto de métodos que un tipo debe implementar para poder usar un tipo de interfaz específico. Las interfaces son implementadas cuando un tipo implementa los métodos de la interfaz, por lo que no se necesitan palabras clave o declaraciones explícitas. Además, cuando se llama a un método implementado por la interfaz, se ejecuta el método que tiene nombre específico y el tipo específico, por lo que una interfaz guarda la información del tipo que implementan sus métodos.
+
+Cuando un objeto de tipo interfaz contiene un valor `nil` pero tiene un tipo conocido, los métodos se pueden llamar (el receiver será nil). Sin embargo, si la interfaz misma es `nil` (no tiene tipo ni valor asignado), llamar un método causará un error en tiempo de ejecución, ya que Go no sabe qué método ejecutar.
+
+Existen también las interfaces vacías que no implementan ningún método, y son conocidas como `empty interface`. Estas pueden guardar valores de cualquier tipo.
+
+### Type assertions
+El tipo `assertion` provee acceso al tipo de dato y al valor que contiene el objeto de una interfaz. Ejemplo:
+```Go
+t := i.(T)
+// Donde "i" es el objeto de tipo interface y "T" es un tipo (int, string, etc.).
+```
+En el ejemplo anterior, la assertion se asegura de que el tipo del valor de un objeto de una interfaz es de cierto tipo (T), y asigna el valor a la variable (t) si es que es verdad. En caso contrario de que el objeto no sea del tipo (T) se produce un error.
+
+Sin embargo, existe otra forma de usar assertions para ver si el objeto de una interfaz es de un tipo específico:
+```Go
+t, ok := i.(T)
+```
+En este caso, la assertion regresa el valor del objeto del tipo especificado (T) a la variable (t) y también regresa `true` (ok) si es que es verdad; pero si el objeto de la interfaz no es del tipo especificado (T), regresa el `zero value` del tipo (t) y `false` (ok), pero no se produce ningún error.
+
+### Type switches
+Un `type` dentro de los switches es un constructo que permite realizar varias `assertions` de diferentes tipos. En estos casos, el funcionamiento es exactamente el mismo que cualquier otro `switch`, con la diferencia de que los `case` evalúan diferentes `type` en lugar de valores (como int), y se usa la palabra reservada `type` dentro de la assertion. Ejemplo:
+```Go
+func do(i interface{}) {
+    switch v := i.(type) {
+    // La variable "v" toma el valor del objeto de la interfaz y su tipo.
+    case int:
+        // El objeto de la interfaz es de tipo int.
+    case string:
+        // El objeto de la interfaz es de tipo sring.
+    default:
+        // El objeto de la interfaz es de otro tipo.
+    }
+}
+```
+
+### Stringers
