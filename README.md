@@ -291,3 +291,28 @@ func do(i interface{}) {
 ```
 
 ### Stringers
+Dentro del paquete `fmt` se encuentra definida la interfaz `Stringer`. Esta interfaz implementa el método `String()`, y cualquier objeto que la implemente puede describirse a sí mismo como un string. El paquete `fmt` y muchos otros buscan esta interfaz en los objetos cuando se imprime dicho objeto, por lo que no es necesario llamar al método explícitamente.
+```Go
+type Stringer interface {
+    String() string
+}
+```
+
+### Errors
+Los programas en Go expresan estados de error con valores de tipo `error`. Este tipo es una interfaz ya integrada en el lenguaje e implementa el método `Error()`, similar al método implementado por la interfaz Stringer, el paquete `fmt` y otros buscan este método al momento de imprimir objetos de tipo error.
+```Go
+type error interface {
+    Error() string
+}
+```
+
+Generalmente, las funciones regresan un valor de tipo `error`, por lo que el código debería manejar y considerar los errores al verificar dicho valor es igual a `nil` o no. Ejemplo:
+```Go
+i, err := strconv.Atoi("42")
+if err != nil {
+    // La función devolvió un error (error != nil).
+}
+// La función no devolvió un error (error == nil).
+```
+
+### Readers

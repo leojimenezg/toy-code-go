@@ -124,6 +124,17 @@ func (r *Rectangle) Area() float64 {
 	return r.w * r.h
 }
 
+type Person struct {
+	Name string
+	Lastname string
+	Age int
+}
+
+// Implements the Stringer interface by using String method
+func (p Person) String() string {
+	return fmt.Sprintf("Name: %v, Lastname: %v, Age: %v", p.Name, p.Lastname, p.Age)
+}
+
 // Package entry point.
 func main() {
 	fmt.Println("Random number:", rand.Intn(10))
@@ -281,6 +292,8 @@ func main() {
 	Ifig = &Rectangle{w: 5, h:3}
 	show_figure_info(Ifig)
 
+	var prs1 Person = Person{"Mike", "Zeth", 23}
+	fmt.Println(prs1)
 }
 
 func show_figure_info(i Figure) {
