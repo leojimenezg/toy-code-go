@@ -316,3 +316,29 @@ if err != nil {
 ```
 
 ### Readers
+El paquete `io` especifica la interfaz `io.Reader`, que representa la lectura de un flujo de datos hasta su fin. La librería estándar de Go tiene muchas implementaciones de esta interfaz, como archivos, conexiones de red, compresores, cifrados, etc.
+
+La interfaz `io.Reader` implementa el método `Read`, y lo que hace este método es llenar un slice de bytes con información y regresar el número de bytes con los que fue llenado el slice, también regresa un valor de tipo error. Cuando el flujo de datos termina, simplemente regresa un error de tipo `io.EOF`.
+```Go
+func (t T) Read(b []byte) (n int, err error)
+```
+
+### Writers
+El paquete `io` también especifica la interfaz `io.Writer`, que representa la escritura de un flujo de datos hasta su fin en un cierto destino.
+
+La interfaz `io.Writer` implementa el método `Write`, y lo que hace este método es escribir los datos desde un slice de bytes hacia un cierto destino, también regresa el número de bytes escritos y un valor de tipo error, que puede contener errores al momento de hacer la escritura.
+```Go
+func (t T) Write(b []byte) (n int, err error)
+```
+
+### Images
+El paquete `image` define la interfaz `Image`, que sirve para representar algunas de las características de las imágenes.
+```Go
+type Image interface {
+    ColorModel() color.Model  // Retorna el modelo de color (RGB, RGBA, etc).
+    Bounds() Rectangle  // Retorna el rectángulo que define el área de la imagen.
+    At(x, y int) color.Color  // Retorna el color del pixel en las coordenadas (x,y).
+}
+```
+
+## Generics
