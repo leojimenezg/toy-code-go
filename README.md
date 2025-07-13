@@ -342,3 +342,33 @@ type Image interface {
 ```
 
 ## Generics
+### Type parameters
+Las funciones en Go pueden usar `type parameters` para trabajar con múltiples tipos. Los type parameters se definen entre `[]` después del nombre de la función y antes de los argumentos.
+```Go
+func Index[T comparable](s []T, x T) int {
+    for i, v := range s {
+        if v == x {
+            return i
+        }
+    }
+    return -1
+}
+```
+
+Los type parameters pueden tener constraints que limitan qué tipos pueden usar:
+* `comparable`: Permite usar `==` y `!=`.
+* `any`: Acepta cualquier tipo (sin restricciones).
+* Constraints personalizadas: Interfaces que definen métodos requeridos.
+
+### Generic types
+También se pueden crear tipos genéricos (structs, interfaces, etc.) que funcionen con múltiples tipos:
+```Go
+type Stack[T any] struct {
+    items []T
+}
+
+intStack := Stack[int]{items: []int{1, 2, 3}}
+stringStack := Stack[string]{items: []string{"a", "b", "c"}}
+```
+
+## Concurrency
