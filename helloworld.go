@@ -3,6 +3,7 @@ package main
 // This kind of import is called "factored" import statement.
 import (
 	"fmt"
+	"time"
 	"strings"
 	"math/rand"
 	"math/cmplx"
@@ -133,6 +134,13 @@ type Person struct {
 // Implements the Stringer interface by using String method
 func (p Person) String() string {
 	return fmt.Sprintf("Name: %v, Lastname: %v, Age: %v", p.Name, p.Lastname, p.Age)
+}
+
+func say(s string) {
+	for i:= range 5 {
+		time.Sleep(100 * time.Millisecond)
+		fmt.Printf("%d: %v\n", i, s)
+	}
 }
 
 // Package entry point.
@@ -294,7 +302,11 @@ func main() {
 
 	var prs1 Person = Person{"Mike", "Zeth", 23}
 	fmt.Println(prs1)
-}
+
+	go say("world")
+	say("hello")
+
+}  // Main end
 
 func show_figure_info(i Figure) {
 	fmt.Printf("Perimeter: %.2f, ", i.Perimeter())

@@ -372,3 +372,54 @@ stringStack := Stack[string]{items: []string{"a", "b", "c"}}
 ```
 
 ## Concurrency
+### Goroutines
+Una `goroutine` es un hilo ligero manejado por Go en `runtime`, básicamente, es una función que se ejecuta concurrentemente (al mismo tiempo) en el programa. La evaluación de los argumentos de dicha función es realizada en la goroutine actual, es decir, en runtime, pero la ejecución de la función ocurre en la `new goroutine` y el momento en que se ejecutan es completamente decidido por el `scheduler` de Go. No son ejecutadas inmediatemente después de crearlas ni después de evaluarlas, sino cuando el `scheduler` lo decide.
+```Go
+go f(x, y, z)  // Nueva goroutine.
+```
+
+Todas las `goroutine` son almacenadas en el mismo espacio de memoria `heap`, por lo que comparten dicho espacio y el acceso a esta memoria compartida debe ser sincronizado. Sin embargo, cada goroutine cuenta con su propio `stack` para almacenar los objetos utilizados en la función que ejecuta.
+
+Un punto que pasa por desapercibido, es que Go, automáticamente mueve las variables del programa que se encuentran en el `stack` al `heap` cuando detecta que esas variables son utilizadas por al menos una `goroutine`, a esto se le llama `escape analysis`. Provoca un poco de overhead (uso adicional de recursos).
+
+Ejemplos:
+```Go
+x := 5
+// Los argumentos se evalúan antes de crear la goroutine.
+go func(val int) {
+    fmt.Printf("Valor en goroutine: %d\n", val)
+}(x) // "x" se evalúa aquí (valor actual: 5)
+x = 10 // Cambiar x no afecta la goroutine.
+```
+
+```Go
+mensaje := "Hola mundo"
+// La goroutine accede a la variable desde el heap.
+go func() {
+    fmt.Println(mensaje) // Accede a la variable compartida.
+}()
+```
+
+```Go
+func problemaDelLoop() {
+    // Todas las goroutines ven la misma variable "i".
+    for i := 0; i < 3; i++ {
+        go func() {
+            fmt.Printf("Goroutine ve i = %d\n", i)
+        }()
+    }
+    // Output probable: "3 3 3" (todas ven el valor final de i).
+}
+
+func solucionDelLoop() {
+    // Pasar "i" como argumento "congela" su valor.
+    for i := 0; i < 3; i++ {
+        go func(val int) {
+            fmt.Printf("Goroutine ve val = %d\n", val)
+        }(i) // "i" se evalúa aquí, congelando su valor actual.
+    }
+    // Output: "0 1 2" (en cualquier orden).
+}
+```
+
+### Channels
