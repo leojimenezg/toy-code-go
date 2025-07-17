@@ -143,6 +143,14 @@ func say(s string) {
 	}
 }
 
+func sumFunc(s []int, c chan int) {
+	sum := 0
+	for _, v := range s {
+		sum += v
+	}
+	c <- sum
+}
+
 // Package entry point.
 func main() {
 	fmt.Println("Random number:", rand.Intn(10))
@@ -305,6 +313,13 @@ func main() {
 
 	go say("world")
 	say("hello")
+
+	s2 := []int{7, 2, 8, -9, 4, 0}
+	ch := make(chan int)
+	go sumFunc(s2[:len(s2)/2], ch)
+	go sumFunc(s2[len(s2)/2:], ch)
+	x, y := <-ch, <-ch
+	fmt.Println(x, y, x + y)
 
 }  // Main end
 

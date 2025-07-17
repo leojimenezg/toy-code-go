@@ -423,3 +423,30 @@ func solucionDelLoop() {
 ```
 
 ### Channels
+Los canales son un tipo de conducto por los que se pueden enviar y recibir valores, mediante el uso del operador de canal `<-`. La información fluye en la dirección que apunte el operador de canal, y parecido a los maps y slices, los canales deben ser creados antes de ser usados.
+```Go
+ch := make(chan int)  // Crear un channel antes de usarlo.
+ch <- v  // Enviar "v" al canal "ch".
+v := <- ch  // Recibir del canal "ch" y asignar el valor a "v".
+```
+
+Por defecto, un `unbuffered channel` bloquea todo el envío y recepción de información hasta que ambas partes del canal se encuentren listas y puedan ser completadas, lo  que permite que las goroutines se sincronicen implícitamente. Sin embargo, si el otro lado del canal nunca está listo o nunca se utiliza el canal, se produce un `deadlock` y el programa da error.
+
+Es imporante reconocer que un canal, con la creación por defecto (unbuffered), no puede realmente almacenar ningún elemento, sino que asigna o devuelve el valor del canal directamente a donde se esté requiriendo dicho valor.
+
+### Buffered channels
+A los canales se les puede asignar un `buffer`, es decir, que pueden ser capaces de realmente almacenar cierta cantidad de elementos. Como segundo elemento en la función `make` se puede especificar el tamaño del canal.
+```Go
+ch := make(chan int, 100)  // Canal de máximo 100 elementos.
+```
+
+Sin embargo, un `buffered channel` se bloquea no cuando ambas partes no estén listas, sino que se bloquea cuando está vacío al leer del canal o lleno cuando se escriba en el canal.
+
+Los canales `unbuffered` o dond no se especifica el tamaño del buffer o elementos máximos, es lo mismo que decir que buffer es igual a 0.
+```Go
+ch1 := make(chan int)     // Puede almacenar 0 elementos.
+ch2 := make(chan int, 0)  // Puede almacenar 0 elementos.
+// ch1 == ch2
+```
+
+### Range and Close
