@@ -430,7 +430,7 @@ ch <- v  // Enviar "v" al canal "ch".
 v := <- ch  // Recibir del canal "ch" y asignar el valor a "v".
 ```
 
-Por defecto, un `unbuffered channel` bloquea todo el envío y recepción de información hasta que ambas partes del canal se encuentren listas y puedan ser completadas, lo  que permite que las goroutines se sincronicen implícitamente. Sin embargo, si el otro lado del canal nunca está listo o nunca se utiliza el canal, se produce un `deadlock` y el programa da error.
+Por defecto, un `unbuffered channel` bloquea todo el envío y recepción de información hasta que ambas partes del canal se encuentren listas y puedan ser completadas, lo  que permite que las goroutines se sincronicen implícitamente. Además, si el otro lado del canal nunca está listo o nunca se utiliza el canal, se produce un `deadlock`, pues todas las goroutines se quedan esperando el resultado de un canal y nada se continúa ejecutando debido a esa espera.
 
 Es imporante reconocer que un canal, con la creación por defecto (unbuffered), no puede realmente almacenar ningún elemento, sino que asigna o devuelve el valor del canal directamente a donde se esté requiriendo dicho valor.
 
@@ -450,3 +450,35 @@ ch2 := make(chan int, 0)  // Puede almacenar 0 elementos.
 ```
 
 ### Range and Close
+Naturalmente, un canal tiene un `sender` y un `receiver`. Por lo tanto, un `sender` puede usar `close` en un canal, para indicar que ya no se van a enviar más elementos por ese canal. Es decir, que sirve para cerrar un canal, lo que implica que no se puede mandar o almacenar más elementos en dicho canal, sin embargo, sí es posible seguir leyendo los elementos del canal siempre y cuando no esté vacío.
+
+Por otro lado, los receivers pueden comprobar si un canal ya no contiene elementos y ha sido cerrado al recibir un segundo parámetro al asignar un elemento del canal. Los canales nunca son cerrados automáticamente, pero es importante saber en qué casos se necesita especificar que el canal ya no va a enviar elementos y se va a cerrar (como en loops con range).
+```Go
+v, ok := <-ch
+// Si "ok" es "true", todavía hay valores y no ha sido cerrado el canal.
+// Si "ok" es "false", ya no hay valores y el canal ha sido cerrado.
+```
+
+Además, el uso de `range` en un loop con un canal, hace que se reciban los elementos de dicho canal repetidamente hasta que el canal es cerrado.
+```Go
+for v := range ch {
+    // Trabajar con cada elemento del canal hasta que se cierre.
+}
+```
+
+Si el canal no es cerrado y se usa en un loop con range, el loop nunca dejará de esperar nuevos elementos del canal, lo que causará deadlock:
+```Go
+ch := make(chan int)
+go func() {
+    ch <- 1
+    ch <- 2
+    // No hay "close()" en el sender del canal.
+}()
+
+// No sabe que el canal ya no va a enviar elementos y provoca deadlock.
+for v := range ch {
+    fmt.Println(v)
+}
+```
+
+### Select

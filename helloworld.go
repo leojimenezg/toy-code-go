@@ -151,6 +151,15 @@ func sumFunc(s []int, c chan int) {
 	c <- sum
 }
 
+func fibonacciCh(n int, c chan int) {
+	x, y := 0, 1
+	for i:=0; i < n; i++ {
+		c <- x
+		x, y = y, x + y
+	}
+	close(c)
+}
+
 // Package entry point.
 func main() {
 	fmt.Println("Random number:", rand.Intn(10))
@@ -320,6 +329,13 @@ func main() {
 	go sumFunc(s2[len(s2)/2:], ch)
 	x, y := <-ch, <-ch
 	fmt.Println(x, y, x + y)
+
+	n := 10
+	c1 := make(chan int, n)
+	go fibonacciCh(n, c1)
+	for vl := range c1 {
+		fmt.Println(vl)
+	}
 
 }  // Main end
 
