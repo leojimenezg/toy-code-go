@@ -482,3 +482,18 @@ for v := range ch {
 ```
 
 ### Select
+La palabra reservada `select` permite a una `goroutine` esperar el resultado de múltiples canales, por lo que detiene la ejecución de la rutina hasta que alguno de los casos pueda ser ejecutado. Sin embargo, si múltiples casos pueden ser ejecutados, elige uno aleatoriamente.
+
+Además, se puede hacer uso de `default` junto con esta sentencia para poder ejecutar un caso cuando ningún otro caso pueda ser ejecutado y evitar que la rutina actual se bloquee.
+```Go
+select {
+case <-c:
+// Hacer algo porque se recibió algo de c.
+case <-quit:
+// Hacer algo porque se recibió algo de quit.
+default:
+// Hacer algo cuando no se reciba nada de c o quit.
+}
+```
+
+Si no se usa `default`, la `goroutine` se bloqueará hasta que al menos uno de los casos pueda ejecutarse. Select evaluará un único caso: si solo uno está listo, ejecutará ese; si varios están listos, elegirá uno aleatoriamente.
