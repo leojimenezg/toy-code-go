@@ -1,4 +1,4 @@
-package stringers
+package examples
 
 import "fmt"
 

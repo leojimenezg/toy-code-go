@@ -3,6 +3,9 @@
 ## References
 * [Go Documentation](https://go.dev/doc/)
 * [A Tour of Go](https://go.dev/tour)
+* [How to Write Go Code](https://go.dev/doc/code)
+
+***A Tour of Go***
 
 ## Basics
 ### Packages
@@ -497,3 +500,52 @@ default:
 ```
 
 Si no se usa `default`, la `goroutine` se bloqueará hasta que al menos uno de los casos pueda ejecutarse. Select evaluará un único caso: si solo uno está listo, ejecutará ese; si varios están listos, elegirá uno aleatoriamente.
+
+***How to Write Code***
+
+## Code organization
+Go se maneja por paquetes y módulos. Un paquete es una colección de archivos de código que se encuentran en un mismo directorio y se compilan juntos. Por otro lado, un módulo es una colección de paquetes de Go relacionados que se publican juntos como una unidad.
+
+Cada módulo y paquete debe ser identificado de alguna forma. Para esto, existe el `module path`, que es un string (nombre) que identifica de forma única al módulo. Mientras que el `import path` es la ruta que identifica a un paquete dentro de un módulo, formada por el module path más la ruta del directorio donde se encuentra el paquete dentro del módulo.
+
+Este sistema de identificación es necesario para que Go pueda localizar y manejar correctamente todos los paquetes y módulos. Para gestionar esta información, se utiliza el archivo `go.mod`, que se crea con el comando `go mod init`. Este archivo contiene el module path, la versión de Go requerida, y las dependencias externas del módulo con sus versiones específicas. El comando `go mod tidy` actualiza automáticamente este archivo, agregando las dependencias que realmente se usan en el código y eliminando las que ya no son necesarias.
+
+## Your first program
+Go recomienda seguir los siguientes pasos para crear un proyecto simple:
+1. Crear el directorio que contendrá el proyecto.
+2. Crear el archivo `go.mod`.
+3. Crear los archivos que se vayan a usar.
+    * Se debe tener en cuenta que cualquier comando ejecutable siempre debe usar el paquete main.
+4. Construir e instalar el proyecto con el comando `go install module-path`.
+    * Este comando construye el proyecto al crear un archivo binario ejecutable y lo instala dentro de la ruta `$HOME/go/bin/nombre-programa`
+    * La ruta de instalación depende de las variables GOPATH y GOBIN.
+5. Ejecutar el archivo binario como resulte conveniente.
+    * El nombre del archivo binario ejecutable generado es tomado a partir del identificador del propio módulo.
+
+### Importing packages from your module
+Algo importante por aclarar, es que en Go hay dos posibles "resultados finales". Puede ser que se creen archivos binarios ejecutables que utilicen siempre el paquete main; o que se creen librerías/paquetes que no utilicen el paquete main ni sean ejecutables directamente, sino que puedan ser utilizados por otros códigos.
+
+Para poder crear y usar un paquete dentro del mismo módulo, se recomienda seguir los siguientes pasos:
+1. Crear el directorio que actuará como el paquete dentro del módulo.
+2. Crear los archivos `.go` con el código del paquete.
+3. Compilar el paquete con el comando `go build` (opcional para verificación).
+    * Este comando no genera ningún archivo de salida visible. Simplemente verifica que el paquete compile correctamente y almacena el resultado en el caché local de Go.
+4. Importar el paquete usando el import path completo: `module-path/nombre-del-directorio`.
+
+Las funciones, tipos, variables y constantes que empiecen con letra mayúscula son exportadas (públicas) y pueden ser usadas desde otros paquetes. Las que empiecen con letra minúscula son privadas del paquete.
+
+### Importing packages from remote modules
+El import path puede describir cómo obtener el código de un paquete externo al usar sistemas de control de versiones como Git o Mercurial. Go utiliza esta característica para automáticamente obtener los paquetes de repositorios remotos.
+
+Una parte importante de esto, es el comando `go mod tidy`. Este comando se encarga de descargar los paquetes externos que se estén usando en el código y grabar su requerimiento y versión en el archivo `go.mod`. Además, elimina cualquier dependencia que no se esté usando en el mismo archivo.
+
+Las dependencias son automáticamente descargadas en el subdirectorio `pkg/mod` del directorio indicado por la variable `GOPATH`. El contenido descargado para una versión específica de un módulo es compartido entre todos los módulos que requieran esa misma versión, por lo que Go marca esos archivos y directorios como read-only.
+
+Para remover todas las dependencias descargadas, se puede usar el comando `go clean -modcache`.
+
+## Testing
+Para hacer pruebas del código, Go ofrece un pequeño framework, para usarlo se necesita el comando `go test` y el paquete estándar `testing`.
+
+Para crear una prueba, se debe crear un archivo con terminación `_test.go` que contenga una función llamada `TestXXX` con la firma `func (t *testing.T)`. La prueba ejecuta la función, y si esta llama a alguna función de error, como `t.Error` o `t.Fail`, se considera que la prueba ha fallado.
+
+Para ejecutar la prueba, simplemente se debe estar dentro del directorio donde se encuentra la prueba y usar el comando `go test`.

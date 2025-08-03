@@ -1,4 +1,4 @@
-package readers
+package examples
 
 import "golang.org/x/tour/reader"
 

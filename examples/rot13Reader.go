@@ -1,4 +1,4 @@
-package rot13Reader
+package examples
 
 import (
 	"io"

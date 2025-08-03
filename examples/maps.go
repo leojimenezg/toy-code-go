@@ -1,4 +1,4 @@
-package maps
+package examples
 
 import (
 	"golang.org/x/tour/wc"

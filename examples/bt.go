@@ -1,4 +1,4 @@
-package bt
+package examples
 
 import (
 	"golang.org/x/tour/tree"
