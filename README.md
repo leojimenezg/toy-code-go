@@ -4,6 +4,7 @@
 * [Go Documentation](https://go.dev/doc/)
 * [A Tour of Go](https://go.dev/tour)
 * [How to Write Go Code](https://go.dev/doc/code)
+* [The Go Programming Language Specification](https://go.dev/ref/spec)
 
 ***A Tour of Go***
 
@@ -549,3 +550,25 @@ Para hacer pruebas del código, Go ofrece un pequeño framework, para usarlo se 
 Para crear una prueba, se debe crear un archivo con terminación `_test.go` que contenga una función llamada `TestXXX` con la firma `func (t *testing.T)`. La prueba ejecuta la función, y si esta llama a alguna función de error, como `t.Error` o `t.Fail`, se considera que la prueba ha fallado.
 
 Para ejecutar la prueba, simplemente se debe estar dentro del directorio donde se encuentra la prueba y usar el comando `go test`.
+
+***The Go Programming Language Specification***
+
+## Introduction
+Go es un lenguaje de programación de propósito general, es compilado y de tipado estático. Diseñado para ser simple pero poderoso. Go hace garbage collection automáticamente, es muy expresivo, maneja programación concurrente. Su idea base es "menos es más", pues deliberadamente no da muchas opciones para hacer algo (como en C), pero las pocas opciones que da son más que suficientes.
+
+## Notation
+Esta sección se refiere a la sintáxis usada a lo largo de la especificación del lenguaje para poder representar y explicar varios aspectos. Por lo tanto, es importante entender los símbolos.
+* `""` significa "tokens literales (keywords)".
+* `|` significa "alternación (OR)".
+* `{}` significa "cero o más repeticiones".
+* `[]` significa "opcional".
+* `()` significa "agrupación".
+* `a...b` significa "conjunto de caracteres de 'a' hasta 'b'"
+
+## Source code representation
+Go representa cada letra en el código como un código único (code point) del estándar Unicode, y los codifica usando UTF-8, por lo tanto, un archivo de código fuente debe ser una secuencia válida de UTF-8, por lo que puede trabajar con múltiples lenguajes nativamente.
+
+Esto significa que, Go, usa Unicode para representar cada caracter del código usando code points, y luego, usa UTF-8 para convertir esos códigos Unicode en bytes.
+
+## Lexical elements
+
