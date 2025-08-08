@@ -571,4 +571,122 @@ Go representa cada letra en el código como un código único (code point) del e
 Esto significa que, Go, usa Unicode para representar cada caracter del código usando code points, y luego, usa UTF-8 para convertir esos códigos Unicode en bytes.
 
 ## Lexical elements
+Los elementos léxicos son los "bloques de construcción" más básicos del lenguaje, es decir, son esos elementos (palabras) de Go consideradas como unidades mínimas que el compilador puede reconocer.
 
+### Comments
+Los comentarios sirven como documentación del programa dentro del mismo. Existen dos formas en que se pueden usar:
+* `//` Comentarios de línea.
+* `/**/` Comentarios generales.
+Un comentario no puede iniciar dentro de una `rune`, de un `string literal` o de otro comentario.
+
+### Tokens
+Los tokens son básicamente todos los elementos del vocabulario de Go. Se dividen en cuatro clases: `identifiers`, `keywords`, `operators and punctuation` y `literals`.
+
+### Semicolons
+La sintáxis formal de Go usa el punto y coma `;` como finalizadores en diversas producciones. Sin embargo, la mayoría de programas peden omitir su uso siempre y cuando se sigan las siguientes dos reglas:
+* Cuando la producción es dividida en múltiples tokens, un semicolon es automáticamente insertado inmediatamente después del último token.
+* Para permitir producciones complejas que ocupen una sola línea, el semicolon puede ser omitido después de los signos de agrupación terminantes `)` o `}`.
+
+### Identifiers
+Los identificadores nombran entidades del programa, como variables o tipos. Estos son una secuencia de una o más letras y dígitos, donde el primer caracter del identificador debe ser una letra.
+* `identifier = letter { letter | unicode_digit }`.
+
+### Keywords
+Las palabras clave son palabras propias del lenguaje y no pueden ser usadas como identificadores.
+* `break`
+* `case`
+* `chan`
+* `const`
+* `continue`
+* `default`
+* `defer`
+* `else`
+* `fallthrough`
+* `for`
+* `func`
+* `go`
+* `goto`
+* `if`
+* `import`
+* `interface`
+* `map`
+* `package`
+* `range`
+* `return`
+* `select`
+* `struct`
+* `switch`
+* `type`
+* `var`
+
+### Operators and punctuation
+Existen caracteres o secuencias de caracteres que representan operadores y signos de puntiación.
+* `+`
+* `-`
+* `*`
+* `/`
+* `%`
+* `&`
+* `|`
+* `^`
+* `<<`
+* `>>`
+* `&^`
+* `+=`
+* `-=`
+* `*=`
+* `/=`
+* `%=`
+* `&=`
+* `|=`
+* `^=`
+* `<<=`
+* `>>=`
+* `&^=`
+* `&&`
+* `||`
+* `<-`
+* `++`
+* `--`
+* `==`
+* `<`
+* `>`
+* `=`
+* `!`
+* `~`
+* `!=`
+* `<=`
+* `>=`
+* `:=`
+* `...`
+* `(`
+* `[`
+* `{`
+* `,`
+* `.`
+* `)`
+* `]`
+* `}`
+* `;`
+* `:`
+
+### Integer literals
+Un entero literal es una secuencia de dígitos que representan un entero constante. Estos pueden contener un prefijo optional que establece una base no-decimal: `0b` o `0B` para binario; `0`, `0o` o `00` para octal; y `0x` o `0X` para hexadecimal. Además, para mejorar la legibilidad de los dígitos, se puede usar `_` para representar separaciones, pero, debe aparecer únicamente después del prefijo o entre los dígitos, no al inicio ni al final.
+
+### Floating-point literals
+Un punto flotante literal es una representación decimal o hexadecimal de una constante de punto flotante. Estos se componen de su parte decimal, el punto decimal, y la parte fraccionaria, incluso pueden contener representación científica mediante el uso de `e` o `E`. Además, igual que los integer literals, pueden usar `_` para mejorar su legibilidad.
+
+### Imaginary literals
+Un imaginario literal representa la parte imaginaria de una constante compleja. Consiste de un entero o punto flotante seguido por la letra minúscula `i`, por lo que el valor resultante es el valor del valor entero o flotante multiplicado por la unidad imaginaria. Sin embargo, para evitar problemas de compatibilidad, se recomienda usar `0` al inicio.
+
+### Rune literals
+Una rune literal representa a una rune constante, es decir, un valor entero que representa un punto de código de Unicode. Estas son expresadas como uno o más caracteres encerrados en comillas simples ', y cualquier caracter que aparezca dentro de ellas representa el valor de Unicode correspondiente a dicho caracter.
+
+Una `rune` es el concepto que Go usa para representar un carácter completo. A diferencia de `char` en C (que siempre ocupa 1 byte para ASCII), una `rune` puede representar cualquier carácter Unicode, incluso aquellos que ocupan de 1 a 4 bytes en UTF-8. Internamente, `rune` es un alias para `int32`, lo que permite representar todo el rango de códigos Unicode.
+
+### String literals
+Un string literal representa un string constante obtenido a partir de concatenar una secuencia de caracteres. Existen dos formas de string literals:
+* `Raw string literals`: Son una secuencia de caracteres encerrados entre backticks `\``. Cualquier caracter puede aparecer dentro de los backticks (excepto el mismo backtick). El valor de este tipo es un string formado por los caracteres sin interpretar, es decir, no se procesan caracteres especiales como escape sequences.
+* `Interpreted string literals`: Son una secuencia de caracteres encerrados entre comillas dobles `""`. Cualquier caracter puede aparecer dentro de las comillas dobles (excepto newline y la misma comilla doble, a menos que sean escapados). El valor de este tipo es un string formado por los caracteres interpretados, procesando caracteres especiales como escape sequences.
+
+## Constants
