@@ -690,3 +690,17 @@ Un string literal representa un string constante obtenido a partir de concatenar
 * `Interpreted string literals`: Son una secuencia de caracteres encerrados entre comillas dobles `""`. Cualquier caracter puede aparecer dentro de las comillas dobles (excepto newline y la misma comilla doble, a menos que sean escapados). El valor de este tipo es un string formado por los caracteres interpretados, procesando caracteres especiales como escape sequences.
 
 ## Constants
+Una constante se refiere a un valor cuyo contenido es conocido en tiempo de compilación y nunca cambian de valor a lo largo de la vida del programa. Las constantes en Go pueden ser de tipo boolean, rune, integer, floating-point, complex, string, incluso sin tipo. Las constantes sin tipo pueden tomar adaptarse a distintos contextos.
+
+El valor de cualquier constante en Go es representado por alguno de los tipos o alguna expresión/operación constanteque pueda ser realizada en tiempo de compilación. Además, el compilador puede implementar las constantes con una precisión interna mayor a la normal de runtime.
+
+## Variables
+Una variable es un espacio de memoria para almacenar un valor, y está sujeta completamente a su tipo. Una declaración de una variable reserva un espacio de memoria en runtime que es identificado por el nombre dado a dicha variable, incluso, se pueden tener espacios de memoria anónimos, que no son accesidos por su identificador, sino por un puntero que contiene su dirección de memoria.
+
+En cuanto a los variables estructuradas (array, slice, struct), estas tienen elementos o miembros a los cuales se les asigna un espacio de memoria individual, por lo que dichos elementos o miembros actúan como variables.
+
+La mayoría de variables tienen un tipo estático, es decir, el tipo que se les asigna en su declaración o de forma implícita. Pero, otras variables como de tipo `interface`, pueden tener un tipo dinámico, que es el tipo del objeto por el cual son implementadas.
+
+Todas las variables tienen un `zero value`, el cual es asignado automáticamente si ningún valor es asignado a una variable ya declarada. 
+
+## Types
