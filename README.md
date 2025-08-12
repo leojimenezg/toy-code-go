@@ -704,3 +704,52 @@ La mayoría de variables tienen un tipo estático, es decir, el tipo que se les 
 Todas las variables tienen un `zero value`, el cual es asignado automáticamente si ningún valor es asignado a una variable ya declarada. 
 
 ## Types
+Un tipo determina el conjunto de valores y operaciones que están disponibles para las variables de ese tipo. Los tipos en Go pueden ser especificados mediante su nombre (named types) o mediante su estructura literal (unnamed types).
+
+Clasificación de tipos:
+* **Predeclarados:** Tipos básicos como `int`, `string`, `bool`, etc. que vienen incluidos en el lenguaje
+* **Definidos por el usuario:** Nuevos tipos creados mediante declaraciones de tipo
+* **Type literals:** Sintaxis para describir tipos compuestos como []int, map[string]int, *Person
+
+Declaraciones de tipo:
+* **Named types:** Se crea un nuevo tipo basado en un tipo predeclarado
+    ```Go
+    type MyInt int
+    ```
+* **Type aliases:** Se crea un sinónimo para un tipo predeclarado, pero, son el mismo tipo
+    ```Go
+    type IntAlias = int
+    ```
+
+Algunos conceptos clave incluyen el **underlying type**, que es el tipo base de un named type. También está la **type identity**, que determina cuándo dos tipos son considerados idénticos, y los **method sets**, que representan el conjunto de métodos disponibles para un tipo.
+
+Una diferencia importante es que los named types pueden tener sus propios métodos, mientras que los type aliases heredan los métodos del tipo original y no se les puede agregar métodos nuevos.
+
+### Boolean types
+Un tipo `bool` representa un par de valores booleanos denotados por las constantes predefinidas `true` y `false`.
+
+### Numeric types
+Existen varios tipos numéricos en Go, como `int`, `float` y `complex`, que representan un conjunto de valores enteros, decimales o complejos, respectivamente. A todos estos se les llama `numeric types`, y los tipos predeclarados independientes de la arquitectura son:
+* `uint8`: conjunto de todos los valores unsigned 8-bit
+* `uint16`: conjunto de todos los valores unsigned 16-bit
+* `uint32`: conjunto de todos los valores unsigned 32-bit
+* `uint64`: conjunto de todos los valores unsigned 64-bit
+* `int8`: conjunto de todos los valores signed  8-bit
+* `int16`: conjunto de todos los valores signed 16-bit
+* `int32`: conjunto de todos los valores signed 32-bit
+* `int64`: conjunto de todos los valores signed 64-bit
+* `float32`: conjunto de todos los valores IEEE 754 32-bit
+* `float64`: conjunto de todos los valores IEEE 754 64-bit
+* `complex64`: conjunto de todos los valores complex con parte real e imaginaria float-32
+* `complex128`: conjunto de todos los valores complex con parte real e imaginaria float-64
+* `byte`: alias for uint8
+* `rune`: alias for int32
+
+También, hay un conjunto de tipos predeclarados cuyo tamaño es específico a la implementación:
+* `uint`: either 32 or 64 bits
+* `int`: same size as uint
+* `uintptr`: an unsigned integer large enough to store the uninterpreted bits of a pointer value
+
+Para evitar problemas de portabilidad, en Go todos los tipos numéricos son definidos, y por lo tanto, específicos a la arquitectura, a excepción de `byte` y `rune`. Además, las conversiones de tipos deben ser explícitas incluso cuando parezca que sean del mismo tamaño.
+
+### String types
