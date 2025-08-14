@@ -753,3 +753,8 @@ También, hay un conjunto de tipos predeclarados cuyo tamaño es específico a l
 Para evitar problemas de portabilidad, en Go todos los tipos numéricos son definidos, y por lo tanto, específicos a la arquitectura, a excepción de `byte` y `rune`. Además, las conversiones de tipos deben ser explícitas incluso cuando parezca que sean del mismo tamaño.
 
 ### String types
+El tipo `string` es una secuencia contigua de bytes que representan a cada uno de los caracteres de dicho string, y puede estar vacío. Por lo tanto, el número de bytes usado para representar el string es su longitud y nunca es negativo. Además, los strings son inmutables, por lo que una vez creados no se pueden modificar.
+
+En Go, los caracteres individuales de los strings pueden ser accedidos mediante índices, sin embargo, no es posible obtener la dirección de memoria de dichos elementos individuales. Una cosa importante a tener en cuenta es que la longitud de un string obtenida mediante la función `len()` no representa la cantidad de caracteres del string, sino los bytes utilizados para representar el string, esto debido al uso de Unicode y UTF-8.
+
+### Array types
