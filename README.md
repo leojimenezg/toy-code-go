@@ -758,3 +758,24 @@ El tipo `string` es una secuencia contigua de bytes que representan a cada uno d
 En Go, los caracteres individuales de los strings pueden ser accedidos mediante índices, sin embargo, no es posible obtener la dirección de memoria de dichos elementos individuales. Una cosa importante a tener en cuenta es que la longitud de un string obtenida mediante la función `len()` no representa la cantidad de caracteres del string, sino los bytes utilizados para representar el string, esto debido al uso de Unicode y UTF-8.
 
 ### Array types
+Un `array` es una secuencia contigua y enumerada de elementos de un solo tipo. Este tipo es llamado tipo del elemento, y el número de elementos establece la longitud del array y nunca es negativa.
+
+La longitud es parte del tipo array, es decir, que una longitud debe ser asignada al momento de declarar un array, esta, debe evaluar a una constante no negativa de tipo entero.
+
+Los arrays, a diferencia de C, siempre se trabajan por valor, por lo que siempre se utilizan completos. Incluso, los arrays son inicializados automáticamente con el zero value correspondiente al tipo del elemento si no se inicializa manualmente.
+
+Por otro lado, los arrays `T` no pueden contener elementos del mismo tipo `T` o tipos que contengan elementos del tipo `T` directa o indirectamente, a menos que los tipos que los contienen sean type literals (compuestos).
+
+### Slice types
+Un `slice` describe un segmento contiguo de un array subyacente y provee acceso a una secuencia de elementos de dicho array, por lo que su tamaño puede ser dinámico. El tipo de elemento del array indica el tipo de elemento del array subyacente.
+
+Los slices contienen tres características fundamentales:
+* **Array pointer:** un puntero que contiene la referencia al primer elemento del segmento del array subyacente al cual tienen acceso.
+* **Length:** el número de elementos del propio slice, y nunca es negativo.
+* **Capacity:** el número máximo de elementos del segmento al cual el slice puede acceder del array subyacente.
+
+Debido a que los slices trabajan con arrays subyacentes, múltiples slices pueden usar el mismo array pero diferentes segmentos de él. Por lo tanto, varios slices pueden representar el mismo array; pero varios arrays no pueden representar el mismo slice.
+
+Un slice puede ser creado usando la función `make()`, la cual siempre crea un nuevo array anónimo utilizado por dicho slice.
+
+### Struct types
