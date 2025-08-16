@@ -779,3 +779,26 @@ Debido a que los slices trabajan con arrays subyacentes, múltiples slices puede
 Un slice puede ser creado usando la función `make()`, la cual siempre crea un nuevo array anónimo utilizado por dicho slice.
 
 ### Struct types
+Una `struct` es una secuencia de de elementos nombrados, a los cuales se les conoce como miembros, y cada uno de estos debe tener un nombre y un tipo. Dichos miembros pueden ser nombrados explícitamente o implícitamente, sin embargo, deben ser únicos, a menos que sean miembros vacíos o de relleno.
+
+Un miembro que es declarado con un tipo pero sin un nombre explícitamente, es llamado `embedded field`, donde este actúa tanto como tipo como el nombre del miembro. Esto es válido siempre y cuando no se repitan los tipos (nombres).
+
+La declaración de un miembro de cualquier struct puede ser seguida de una `tag` opcional, que actúa como atributo de todos los miembros que se encuentren en la declaración correspondiente a la etiqueta. Una etiqueta vacía es lo mismo que una etiqueta ausente. Para poder trabajar con las etiquetas directamente, se necesita el paquete `reflect`
+
+Por otro lado, los structs `T` no pueden contener elementos del mismo tipo `T` o tipos que contengan elementos del tipo `T` directa o indirectamente, a menos que los tipos que los contienen sean type literals (compuestos).
+
+### Pointer types
+Un `pointer` o puntero permite almacenar la dirección de memoria de una variable de algún tipo específico, donde dicho tipo se convierte en el tipo base del puntero. El zero value de un puntero es `nil`.
+
+Los punteros en Go utilizan los operadores `&` para obtener la dirección de una variable y `*` para desreferenciar (acceder al valor apuntado). A diferencia de C, Go no permite aritmética de punteros por razones de seguridad, por lo que no se puede incrementar, decrementar o realizar operaciones matemáticas sobre las direcciones de memoria.
+
+Una característica importante es que Go detecta algunos casos de `nil` pointer dereference en runtime, generando un panic en lugar de comportamiento indefinido.
+
+### Function types
+Una `func` es un tipo usado para representar a las funciones, donde su zero value es `nil`.
+
+Las funciones en Go son `first-class citizens`, por lo que pueden ser asignadas a variables, ser pasadas como parámetros y ser devueltas por otras funciones. Estas pueden regresar ninguno o múltiples valores en un mismo retorno, incluso, dichos valores retornados pueden ser nombrados.
+
+Existen también funciones anónimas y funciones variadicas que reciben una cantidad desconocida de parámetros.
+
+### Interface types
