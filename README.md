@@ -838,3 +838,19 @@ Las interfaces más genéricas pueden especificar diferentes restricciones de ti
 * Las generic interfaces pueden embeberse en otras interfaces genéricas
 
 ### Map types
+Un `map` es un grupo de elementos sin un orden específico de un mismo tipo, donde a este tipo se le llama el tipo del elemento. Cada elemento está indexado por un conjunto de `keys` únicas de otro tipo (pero todas las llaves deben ser del mismo tipo),  donde a este tipo de le llama el tipo de la llave. Por lo tanto, un mapa toma la forma de `key: value`.
+
+El valor de un mapa sin inicializar es `nil`, y no se pueden agregar valores, pero, esto es diferente a un mapa vacío donde sí se pueden agregar nuevos valores. Por otro lado, el tipo de la llave debe poder ser comparable y tener bien definidos los operadores de comparación `(==, !=)`, por lo que las llaves no pueden ser de tipo función, mapa, slice, etc.
+
+El número de elementos de un mapa es conocido como su **length** (longitud) y puede ser obtenida usando la función `len()`. También, un mapa puede ser creado con la función `make()` que recibe el mapa a crear y su capacidad inicial opcinal, aunque esta no limita al propio mapa.
+
+### Channel types
+Un `chan` proporciona un mecanismo para al ejecutar funciones de forma concurrente se puedan comunicar al enviar y recibir valores de un tipo específico. El valor de un canal sin inicializar es `nil`.
+
+Para trabajar con los canales se debe utilizar el operador `<-`, pues este especifica la dirección del canal, ya sea para enviar o para recibir. Si se provee la dirección, se usará esa, sino, se considerará como bidireccional. Además, los canales pueden ser limitados a simplemente recibir o enviar.
+
+Los canales se pueden crear usando la función `make()`, donde se recibe el canal a crear y opcionalmente la capacidad (buffer) del canal. Si no se especifica la capacidad o es igual a cero, se crea un canal unbuffered. Por otro lado, se puede usar la función `close()` para cerrar un canal. Un canal puede ser usado en múltiples funciones concurrentes sin necesidad de sincronización, pues la propia naturaleza de los canales permite este comportamiento.
+
+Cabe mencionar que un `unbuffered channel` simplemente puede ser usado cuando ambas partes de la comunicación estén listas, es decir, cuando hay alguien que envía un valor alguien que recibe ese valor. Mientras que un `buffered channel` puede estar constantemente recibiendo y enviando valores, siempre y cuando no esté lleno o vacío, respectivamente. Además, funcionan usando el concepto FIFO (First-In, First-Out).
+
+## Properties of types and values
