@@ -802,3 +802,39 @@ Las funciones en Go son `first-class citizens`, por lo que pueden ser asignadas 
 Existen también funciones anónimas y funciones variadicas que reciben una cantidad desconocida de parámetros.
 
 ### Interface types
+Una `interface` establece comportamiento en lugar de una estructura, por lo que actúa como un contrato que establece comportamientos que un tipo debe implementar para poder ser considerado del tipo de esa interfaz o implementar la propia interfaz.
+
+Una variable de tipo interfaz puede almacenar un valor de cualquier tipo que implemente dicha interfaz. Dicho tipo se considerará del tipo interfaz. Por otro lado, el zero value de un tipo interfaz es `nil`.
+
+Una interfaz es definida por una lista de elementos de la interfaz, donde un elemento puede ser un método (función) u otro elemento de un solo tipo. Su implementación se hace de forma implícita al simplemente implementar los elementos de la interfaz, por lo que no es necesario usar palabras clave ni implementación explícita.
+
+#### Basic interfaces
+Estas son las formas más básicas de una interfaz, donde simplemente se especifica un listado de métodos.
+
+Los nombres de los métodos deben ser únicos y no estar en blanco. Diferentes tipos pueden implementar las mismas interfaces, incluso, pueden implementar múltiples interfaces al mismo tiempo.
+
+Por otro lado, la interfaz vacía `interface{}` (y su alias `any`) puede contener cualquier tipo (no solo "tipos que no son de tipo interfaz"). Incluso otras interfaces pueden ser asignadas a `interface{}`.
+
+#### Embedded interfaces
+Estas son formas un poco más generales de una interfaz, donde una interfaz puede embeber o incluir otras interfaces dentro de su lista de elementos. Esto permite crear composición de comportamientos al combinar múltiples interfaces en una sola.
+
+Cuando una interfaz embebe otras interfaces, un tipo debe implementar todos los métodos de todas las interfaces embebidas para satisfacer la interfaz compuesta. Si diferentes interfaces embebidas contienen métodos con el mismo nombre, estos deben tener la misma firma (mismos parámetros y valores de retorno) para evitar conflictos.
+
+Las interfaces embebidas facilitan la composición y reutilización de comportamientos, permitiendo construir interfaces más complejas a partir de interfaces más simples y específicas.
+
+#### Generic interfaces
+Estas son las formas completamente generales de una interfaz, donde una interfaz puede contener elementos de tipo arbitrario `T` (genérico) o tipos `~T` que contengan un tipo `T` subyacente. Junto con métodos con parámetros de tipo arbitrario, permiten definición genérica y reutilización de código para múltiples tipos.
+
+Las interfaces más genéricas pueden especificar diferentes restricciones de tipo usando:
+* **Tipos exactos:** `T` acepta solo el tipo `T`
+* **Underlying types:** `~T` acepta cualquier tipo con underlying type `T`
+* **Union types:** `T1 | T2` acepta `T1` o `T2`
+* **Combinaciones:** `~T1 | ~T2` acepta tipos `T` con esos underlying types
+
+**Limitaciones importantes:**
+
+* Una generic interface que contiene type constraints no puede ser usada como tipo de variable ordinaria, solo como constraint en funciones o tipos genéricos
+* Los type constraints y los métodos pueden combinarse en la misma interfaz
+* Las generic interfaces pueden embeberse en otras interfaces genéricas
+
+### Map types
