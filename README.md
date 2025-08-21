@@ -854,3 +854,33 @@ Los canales se pueden crear usando la función `make()`, donde se recibe el cana
 Cabe mencionar que un `unbuffered channel` simplemente puede ser usado cuando ambas partes de la comunicación estén listas, es decir, cuando hay alguien que envía un valor alguien que recibe ese valor. Mientras que un `buffered channel` puede estar constantemente recibiendo y enviando valores, siempre y cuando no esté lleno o vacío, respectivamente. Además, funcionan usando el concepto FIFO (First-In, First-Out).
 
 ## Properties of types and values
+### Representation of values
+Todos los valores de los tipos predeclarados, arreglos y structs contienen su propia información almacenada directamente en ellos mismos, es decir, se utilizan por valor. Cuando se asignan o pasan como parámetros, siempre se crea una copia completa de toda su información, la cual es almacenada directamente en la variable de dicho tipo.
+
+Por otro lado, tipos como punteros, funciones, slices, mapas y canales se utilizan por referencia y almacenan metadatos que referencian a su información subyacente. Por ejemplo, un slice no solo contiene una referencia al array subyacente, sino también metadatos como longitud y capacidad. Esto permite que múltiples variables puedan referenciar la misma información subyacente pero con diferentes metadatos.
+
+El tipo interfaz tiene un comportamiento dinámico en cuanto a su representación: su valor puede ser autocontenido o referenciado, dependiendo del tipo dinámico de la interfaz (es decir, del tipo concreto que implementa la interfaz en tiempo de ejecución).
+
+Una consecuencia importante de esta distinción es que los tipos que se usan por valor tienen un zero value que nunca es `nil` (por ejemplo, `0` para enteros, `""` para strings), mientras que el zero value de los tipos que se usan por referencia siempre es `nil`.
+
+### Underlying types
+Todos los tipos en Go tienen un tipo subyacente (underlying type) que define su estructura fundamental y representación en memoria.
+
+Para tipos predeclarados (como `int`, `string`, `bool`), el tipo subyacente es el tipo mismo, es decir, el underlying type de `int` es `int`.
+
+Para tipos compuestos construidos con type literals (como `[]int`, `map[string]int`, `chan bool`), el tipo subyacente es la estructura del type literal mismo.
+
+Es importante mencionar que incluso si dos tipos diferentes usan el mismo tipo subyacente, siguen siendo dos tipos completamente diferentes, a menos que sean declarados como aliases.
+
+En resumen, el underlying type aplica a todos los tipos individualmente y determina la forma en que se va a representar dicho tipo en la memoria y las operaciones básicas permitidas.
+
+### Core types
+Todos los tipos que no son interfaces tienen un core type, el cual es idéntico a su underlying type.
+
+Las interfaces tienen un comportamiento especial para determinar su core type. Una interfaz tiene un core type únicamente si se cumple una de estas condiciones:
+1. Todos los tipos en el type set de la interfaz comparten el mismo underlying type T, y al menos uno de esos tipos no es una interfaz. En este caso, el core type de la interfaz es T.
+2. Todos los tipos en el type set son tipos de canal con el mismo element type y la misma dirección (send, receive, o bidireccional).
+
+Si una interfaz no cumple ninguna de estas condiciones, no tiene core type, y el core type por definición nunca puede ser un tipo definido, creado o de tipo interfaz.
+
+En resumen, el core type aplica o está diseñado principalmente para las interfaces usadas de forma genérica (type constraints) y garantiza que todos los tipos en el type set de dichas interfaces permitan realizar las mismos operaciones.
