@@ -884,3 +884,54 @@ Las interfaces tienen un comportamiento especial para determinar su core type. U
 Si una interfaz no cumple ninguna de estas condiciones, no tiene core type, y el core type por definición nunca puede ser un tipo definido, creado o de tipo interfaz.
 
 En resumen, el core type aplica o está diseñado principalmente para las interfaces usadas de forma genérica (type constraints) y garantiza que todos los tipos en el type set de dichas interfaces permitan realizar las mismos operaciones.
+
+### Type identity
+Esta propiedad se refiere a cuándo dos tipos son considerados exactamente el mismo tipo por el compilador de Go, determinando así si comparten idénticas características y comportamientos.
+
+Un tipo definido por el programador (named type como `type MyInt int`) siempre es diferente a cualquier otro tipo, incluso si tienen el mismo underlying type.
+
+Para tipos no-definidos (type literals), dos tipos son idénticos si sus estructuras son completamente equivalentes en todos los aspectos:
+* **Array types:** Idénticos si el tipo de elementos es idéntico y tienen la misma longitud
+* **Slice types:** Idénticos si el tipo de elementos es idéntico
+* **Struct types:** Idénticos si tienen la misma secuencia de campos con nombres idénticos, tipos idénticos, tags idénticas, y el mismo estado de embedding
+* **Pointer types:** Idénticos si apuntan a tipos idénticos
+* **Function types:** Idénticos si tienen igual número de parámetros y resultados con tipos idénticos, y ambas son variádicas o ninguna lo es
+* **Interface types:** Idénticos si definen exactamente el mismo type set
+* **Map types:** Idénticos si los tipos de llaves y valores son idénticos
+* **Channel types:** Idénticos si el tipo de elementos es idéntico y tienen la misma direccionalidad
+
+Que dos tipos sean idénticos quiere decir que esos tipos son iguales en todos sus aspectos individuales relevantes para el compilador. Entonces, type identity implica que dichos tipos puedan ser tratados de la misma forma y no necesiten conversiones explícitas.
+
+### Assignability
+Esta propiedad determina cuándo el valor x de tipo V puede ser asignado a una variable de tipo T, incluso cuando los tipos no son idénticos. Esta flexibilidad permite mayor interoperabilidad en el sistema de tipos de Go.
+
+Un valor es asignable cuando se cumple alguna de estas condiciones:
+* V y T son tipos idénticos (caso más directo)
+* V y T tienen underlying types idénticos, donde ninguno es un type parameter y al menos uno no es un named type
+* V y T son channel types con element types idénticos, donde V es bidireccional y al menos uno no es un named type
+* T es un interface type (no type parameter) y el valor x implementa T (está en el type set de T)
+* x es el valor `nil` y T es un tipo que usa referencias (pointer, function, slice, map, channel, interface) y no es un type parameter
+* x es una constante sin tipo que puede ser representada por el tipo T
+
+### Representability
+Esta propiedad se aplica específicamente a constantes y determina si una constante x puede ser correctamente almacenada y representada como valor de un tipo T (donde T no es un type parameter).
+
+Una constante x es representable por tipo T cuando se cumple alguna de estas condiciones:
+* x está dentro del rango de valores que T puede representar
+* T es un floating-point type y x puede ser redondeado a la precisión de T sin overflow
+* T es un complex type y tanto la parte real como imaginaria de x son individualmente representables por el tipo de componente subyacente de T
+
+Básicamente esta propiedad aplica para las constantes sin tipo que determina si dicha constante puede ser asignada a una variable de cierto tipo sin causar errores de compilación o pérdida de información crítica.
+
+### Method sets
+El conjunto de métodos (method set) de un tipo determina qué métodos pueden ser llamados sobre valores de ese tipo y, crucialmente, qué interfaces puede implementar el tipo.
+
+**Reglas fundamentales:**
+* **Para un tipo definido T:** El method set incluye todos los métodos declarados con receiver de valor (t T)
+* **Para un pointer type \*T:** El method set incluye todos los métodos declarados con receiver de valor (t T) y receiver de pointer (t \*T)
+* **Para un interface type:** El method set de un tipo interfaz es la intersección del conjunto de métodos de cada elementos de la interfaz, es decir, solo los métodos que todos los elementos tienen
+* **Para tipos embedded en structs:** Los métodos del tipo embedded se promueven al method set del struct contenedor
+
+Un tipo T implementa una interfaz I solo si el method set de T contiene todos los métodos requeridos por I. Además, todos los tipos tienen method set (puede estar vacío), y todos los métodos deben tener un nombre único y no estar en blanco.
+
+## Blocks
