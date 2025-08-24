@@ -935,3 +935,15 @@ El conjunto de métodos (method set) de un tipo determina qué métodos pueden s
 Un tipo T implementa una interfaz I solo si el method set de T contiene todos los métodos requeridos por I. Además, todos los tipos tienen method set (puede estar vacío), y todos los métodos deben tener un nombre único y no estar en blanco.
 
 ## Blocks
+Un bloque es una secuencia (posiblemente vacía) de declaraciones y statements encerradas dentro de llaves `{}`.
+
+Los bloques explícitos son aquellos delimitados por llaves visibles en el código, pero también existen bloques implícitos que no requieren llaves:
+* **Universe block:** Engloba todo el código fuente de Go y contiene todas las declaraciones predefinidas (`int`, `string`, `nil`, `true`, etc.)
+* **Package block:** Engloba todo el código fuente dentro de un paquete específico
+* **File block:** Engloba todo el código fuente dentro de un archivo individual
+* **Function block:** Cada función o método crea su propio bloque
+* **Statement blocks:** Estructuras de control (`if`, `for`, `switch`, etc.) y bloques explícitos `{}` crean sus propios bloques
+
+Los bloques forman una jerarquía anidada donde cada bloque interno puede acceder a declaraciones de bloques externos, pero no viceversa. Las declaraciones en bloques internos pueden hacer shadowing (ocultar) declaraciones de bloques externos con el mismo nombre. Esta estructura determina la visibilidad y duración de variables, constantes, tipos y funciones en Go.
+
+## Declarations and scope
