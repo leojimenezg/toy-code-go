@@ -947,3 +947,81 @@ Los bloques explícitos son aquellos delimitados por llaves visibles en el códi
 Los bloques forman una jerarquía anidada donde cada bloque interno puede acceder a declaraciones de bloques externos, pero no viceversa. Las declaraciones en bloques internos pueden hacer shadowing (ocultar) declaraciones de bloques externos con el mismo nombre. Esta estructura determina la visibilidad y duración de variables, constantes, tipos y funciones en Go.
 
 ## Declarations and scope
+Una declaración relaciona un identificador (que no sea blank) a algún objeto de Go, como `const`, `type`, `type parameter`, `variable`, `function`, `label` o `package`. Cualquier identificador usado debe ser declarado y no estar en blanco, además, no se puede declarar el mismo identificador en el mismo bloque. Los identificadores a nivel paquete no pueden redeclararse.
+
+El identificador blank `_` puede usarse como cualquier otro identificador en una declaración, pero no establece ninguna relación (no es realmente "declarado"), permitiendo descartar valores.
+
+**Reglas de scope (Go usa lexical scoping con bloques):**
+1. **Identificadores predeclarados:** Scope del universe block
+2. **Constantes, tipos, variables, o funciones (pero no métodos)**: Scope del package block
+3. **Nombres de paquetes importados:** Scope del file block que contiene la declaración de import
+4. **Method receiver, parámetros de función, o variables de resultado:** Scope del function body
+5. **Type parameter de funciones o method receivers:** Inicia después del nombre de la función y termina al final del function body
+6. **Type parameter de tipos:** Inicia después del nombre del tipo y termina al final del TypeSpec
+7. **Constantes o variables declarados dentro funciones:** Inicia al final del ConstSpec o VarSpec (ShortVarDecl para declaraciones cortas) y termina al final del bloque contenedor más interno
+8. **Tipos declarados dentro de funciones:** Inicia en el identificador del TypeSpec y termina al final del bloque contenedor más interno
+
+Un identificador declarado en un bloque interno puede ocultar uno del bloque exterior con el mismo nombre (shadowing). Por otro lado, la palabra clave `package` no es una declaración, sino una directiva que identifica archivos del mismo paquete y especifica el nombre por defecto al importar.
+
+### Label scopes
+Las labels son declaradas mediante el uso de `:` y son usadas generalmente en las declaraciones de `break`, `continue` y `goto`. Una label declarada debe ser usada, pues no está permitido declararla sin usarla.
+
+A diferencia de otros identificadores, las labels tienen un scope único limitado a la función en la que se declaran y no interfieren con otros identificadores que tengan el mismo nombre (pueden coexistir sin conflicto).
+
+### Blank identifier
+El identificador en blanco es representado por el caracter `_`. Sirve como un placeholder anónimo en lugar de un identificador normal, y puede usarse múltiples veces en el mismo scope sin causar conflictos de redeclaración.
+
+### Predeclared identifiers
+Hay un total de 44 identificadores predeclarados en el bloque universal de Go. Estos son mutables, a diferencia de las keywords, pero no es recomendable hacerlo.
+**Types:**
+* any
+* bool
+* byte
+* comparable
+* complex64
+* complex128
+* error
+* float32
+* float64
+* int
+* int8
+* int16
+* int32
+* int64
+* rune
+* string
+* uint
+* uint8
+* uint16
+* uint32
+* uint64
+* uintptr
+
+**Constants:**
+* true
+* false
+* iota
+
+**Zero value:**
+* nil
+
+**Functions:**
+* append
+* cap
+* clear
+* close
+* complex
+* copy
+* delete
+* imag
+* len
+* make
+* max
+* min
+* new
+* panic
+* print
+* println
+* real
+* recover
+
