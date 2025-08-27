@@ -973,6 +973,7 @@ El identificador en blanco es representado por el caracter `_`. Sirve como un pl
 
 ### Predeclared identifiers
 Hay un total de 44 identificadores predeclarados en el bloque universal de Go. Estos son mutables, a diferencia de las keywords, pero no es recomendable hacerlo.
+
 **Types:**
 * any
 * bool
@@ -1025,3 +1026,42 @@ Hay un total de 44 identificadores predeclarados en el bloque universal de Go. E
 * real
 * recover
 
+### Exported identifiers
+Un identificador puede ser exportado para permitir acceso desde otros paquetes. Un identificador es exportado únicamente cuando cumple ambas condiciones:
+* El primer caracter es una letra mayúscula Unicode
+* El identificador es declarado en el package block o corresponde a un field de struct o es un método
+
+Los identificadores que no cumplan estas condiciones no son exportados y solo pueden usarse dentro del mismo paquete donde se declaran.
+
+### Uniqueness of identifiers
+En un conjunto de identificadores, un identificador es único cuando es diferente a cualquier otro identificador de ese conjunto.
+
+**Dos identificadores son diferentes si:**
+* Se escriben diferente (case-sensitive)
+* Están en paquetes diferentes
+* Están en el mismo paquete pero no son exportados (limitados a su scope local)
+
+**Dos identificadores son iguales si:**
+* Tienen la misma escritura y están en el mismo contexto accesible (mismo paquete o ambos exportados)
+
+### Constant declarations
+Una declaración de constantes relaciona una lista de identificadores con una lista de valores dados por expresiones constantes. La cantidad de identificadores debe coincidir con la cantidad de expresiones.
+
+* **Con tipo explícito:** Si se especifica un tipo, todas las constantes adoptan ese tipo y sus expresiones deben ser asignables a él.
+
+* **Sin tipo explícito:** Cada constante adopta el tipo individual correspondiente a su expresión respectiva.
+* **Declaraciones agrupadas:** En declaraciones múltiples dentro de paréntesis, es posible omitir valores en ConstSpecs posteriores, pues automáticamente reutilizan el valor y tipo del ConstSpec anterior.
+
+**ConstSpec:** Es un término técnico que simplemente se refiere una línea individual donde se declara una constante.
+
+### Iota
+El identificador predeclarado `iota` representa una secuencia numérica entera sin tipo para generar constantes automáticamente.
+
+**Funcionamiento:**
+* Su valor corresponde al índice del ConstSpec en la declaración, iniciando en 0
+* Se incrementa automáticamente en cada nuevo ConstSpec
+* Se resetea a 0 en cada nueva declaración de constantes (`const`)
+
+**Comportamiento especial:** Múltiples usos de `iota` en el mismo ConstSpec representan el mismo valor (no se incrementa dentro de la misma línea).
+
+### Type declarations
