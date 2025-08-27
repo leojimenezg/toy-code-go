@@ -1065,3 +1065,37 @@ El identificador predeclarado `iota` representa una secuencia numérica entera s
 **Comportamiento especial:** Múltiples usos de `iota` en el mismo ConstSpec representan el mismo valor (no se incrementa dentro de la misma línea).
 
 ### Type declarations
+Una declaración de tipo relaciona un identificador (nombre del tipo) con un tipo nuevo o existente. Las declaraciones pueden ser de dos formas: alias declarations y type definitions.
+
+#### Alias declarations
+La declaración de alias (`type NewName = ExistingType`) relaciona un identificador con un tipo existente. No crea un nuevo tipo, simplemente establece una forma alternativa de referenciar el mismo tipo, siendo tratados como idénticos.
+
+Los alias funcionan de acuerdo a su scope. Pueden usar type parameters creando *generic aliases*, los cuales deben ser instanciados al usarse.
+
+#### Type definitions
+La definición de tipo (`type NewName ExistingType`) relaciona un identificador con un tipo completamente nuevo. Crea un *defined type* que usa un tipo existente como underlying type.
+
+**Características de defined types:**
+* Son diferentes a cualquier otro tipo, incluyendo su tipo base
+* Pueden tener métodos propios asociados
+* No heredan métodos del tipo base
+* Pueden ser *generic types* usando type parameters
+
+Para los generic types, los métodos asociados deben declarar la misma cantidad de type parameters que el tipo definido.
+
+### Type parameter declarations
+Una lista de type parameters declara los parámetros de tipo genérico para funciones genéricas o declaraciones de tipos. Su estructura es similar a parámetros regulares, pero están encerrados en corchetes `[]` e inmediatamente después del nombre de la función/tipo y antes de sus parámetros regulares.
+
+Todos los nombres de los type parameters en la lista que no estén en blanco deben ser únicos. Estos actúan como named types temporales que sirven como placeholders, los cuales son reemplazados por tipos concretos duranta la instanciación.
+
+Cada type parameter tiene un type constraint correspondiente que define sus restricciones.
+
+#### Type constraints
+Un type constraint es una interfaz que define el conjunto de tipos permitidos (type set) para un type parameter y controla las operaciones disponibles sobre valores de esos tipos.
+
+#### Satisfying a type constraint
+Un tipo satisface un type constraint cuando:
+* Implementa la interfaz del constraint (tiene los métodos requeridos), o
+* Está incluido en el type set del constraint (listado explícitamente con `|`)
+
+### Variable declarations
