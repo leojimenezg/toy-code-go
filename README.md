@@ -1099,3 +1099,17 @@ Un tipo satisface un type constraint cuando:
 * Está incluido en el type set del constraint (listado explícitamente con `|`)
 
 ### Variable declarations
+La declaración de variable con `var` crea una o más variables, relacionando identificadores con tipos específicos y valores iniciales opcionales. Cuando hay una lista de expresiones, las variables se inicializan con sus valores correspondientes, pero si no se provee inicializador, se asigna el zero value del tipo. El tipo puede especificarse explícitamente o ser omitido, en cuyo caso la variable adopta el tipo inferido de la expresión de inicialización.
+
+### Short variable declarations
+La declaración corta usa el operador `:=` sin necesidad de `var` ni tipo explícito. Solo está permitida dentro de funciones (no a nivel de package) y siempre requiere un inicializador. En asignaciones múltiples, puede redeclarar variables existentes siempre que al menos una variable sea nueva en ese scope.
+
+### Function declarations
+La declaración de función con `func` relaciona un identificador con una función. Una función tiene signature específica (parámetros y valores de retorno) y debe seguir las reglas del lenguaje, como terminar con una expresión de retorno si declara valores de retorno, o manejar todos los casos de ejecución apropiadamente.
+
+### Method declarations
+Un método es una función con un receiver, lo que significa que está asociada específicamente al tipo declarado en su receiver. La declaración de método relaciona un identificador con un método y lo asocia al tipo del receiver correspondiente.
+
+El receiver se declara después de `func` pero antes del nombre del método, debe ser un parámetro único no variádico cuyo tipo sea un defined type o puntero a defined type (llamado receiver base type). El identificador del receiver no puede estar en blanco y debe ser único dentro de toda la signature del método. Los métodos con receiver de valor vs receiver de puntero tienen diferentes method sets, lo que afecta qué interfaces pueden implementar.
+
+## Expressions
