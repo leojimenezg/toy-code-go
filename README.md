@@ -1113,3 +1113,44 @@ Un método es una función con un receiver, lo que significa que está asociada 
 El receiver se declara después de `func` pero antes del nombre del método, debe ser un parámetro único no variádico cuyo tipo sea un defined type o puntero a defined type (llamado receiver base type). El identificador del receiver no puede estar en blanco y debe ser único dentro de toda la signature del método. Los métodos con receiver de valor vs receiver de puntero tienen diferentes method sets, lo que afecta qué interfaces pueden implementar.
 
 ## Expressions
+Una expression especifica la computación a realizar aplicando operadores y funciones a valores (operandos).
+
+### Operands
+Los operands representan los valores elementales usados en expresiones. Pueden ser identificadores que representen constantes, variables o funciones, o expresiones anidadas entre paréntesis. 
+
+El blank identifier `_` solo puede usarse en el lado izquierdo de asignaciones para descartar valores.
+
+### Qualified identifiers
+Un qualified identifier accede a identificadores exportados de otros paquetes usando la sintaxis `package.Identifier`. Tanto el nombre del paquete como el identificador deben ser no-blank, y el identificador debe estar exportado (empezar con mayúscula) para ser accesible desde el paquete importador.
+
+### Composite literals
+Los composite literals construyen valores para tipos compuestos (structs, arrays, slices, maps) usando la sintaxis `Type{elements}`. Cada evaluación crea una nueva instancia.
+
+La estructura de los elementos varía según el tipo: los structs pueden usar nombres de campos, los arrays pueden especificar índices, etc. Para type parameters, todos los tipos en su type set deben ser válidos para composite literals para poder usarlos.
+
+### Function literals
+Una function literal representa una función anónima que no puede declarar type parameters. Puede ser asignada a variables o invocada directamente. Las function literals son closures, lo que significa que pueden capturar y usar variables del scope externo donde se definen. Estas variables capturadas son compartidas entre la función externa y el closure, manteniéndose vivas mientras el closure exista.
+
+### Primary expressions
+Las primary expressions son los operandos fundamentales para construir expresiones más complejas (unarias y binarias). Incluyen identificadores, literals, expresiones entre paréntesis, y expresiones que acceden a elementos o campos.
+
+### Selectors
+Un selector (`expression.selector`) accede a un campo o método de un valor. La expresión debe ser primary y no puede ser un nombre de paquete. Los selectors funcionan automáticamente tanto con valores directos como con punteros, pues Go maneja implícitamente la dereferenciación cuando es necesario.
+
+### Method expressions
+Una method expression es una forma de referenciar un método de un tipo como si fuera una función regular, donde el receiver se convierte en el primer parámetro explícito de la función.
+
+Cuando se define un método con la sintaxis `func (t T) Method(args) ReturnType { ... }`, se puede crear una method expression usando `T.Method`. Esta expresión resulta en una función que tiene la firma `func(t T, args) ReturnType`, donde el receiver original ahora es el primer parámetro explícito.
+
+Las method expressions se diferencian de los method values. Una method expression como `T.Method` requiere que se pase la instancia como primer argumento cuando es llamada. Por el otro lado, un method value como `instance.Method` ya tiene la instancia "capturada" y no necesita que se le pase explícitamente.
+
+En cuanto a las reglas para crear method expressions, solo se pueden crear desde el tipo que está en el method set correspondiente. Los métodos con value receivers `(t T)` permiten la sintaxis `T.Method`. Sin embargo, los métodos con pointer receivers `(t *T)` únicamente permiten `(*T).Method`, ya que estos métodos no forman parte del method set del tipo valor.
+
+### Method values
+Un method value es una forma de referenciar un método desde una instancia específica, donde el receiver queda "capturado" dentro de la función resultante.
+
+Cuando se tiene una instancia y se referencía uno de sus métodos usando `instance.Method` (sin paréntesis), se obtiene una función que ya no requiere el receiver como parámetro. Si el método original tiene la firma `func(t T) Method(args) ReturnType`, el method value resultante tiene la firma `func(args) ReturnType`.
+
+A diferencia de las method expressions, los method values pueden crearse desde cualquier instancia, independientemente del tipo de receiver del método. Go realiza automáticamente las conversiones necesarias entre `T` y `*T` cuando se crea el method value, permitiendo que tanto valores como punteros puedan generar method values para métodos con cualquier tipo de receiver.
+
+### Index expressions
