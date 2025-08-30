@@ -1154,3 +1154,50 @@ Cuando se tiene una instancia y se referencía uno de sus métodos usando `insta
 A diferencia de las method expressions, los method values pueden crearse desde cualquier instancia, independientemente del tipo de receiver del método. Go realiza automáticamente las conversiones necesarias entre `T` y `*T` cuando se crea el method value, permitiendo que tanto valores como punteros puedan generar method values para métodos con cualquier tipo de receiver.
 
 ### Index expressions
+Una primary expression en la forma `a[x]` representa un elemento de un array, slice, string o map donde `x` es su índice o posición (para arrays, slices y strings), o clave (para maps).
+
+**Para arrays, slices y strings:**
+El índice debe ser una constante sin tipo o un valor de tipo `int`. Debe ser un número no negativo representable por el tipo `int`, y debe estar en el rango `0 <= index < len(object)`. Una constante sin tipo usada como índice toma automáticamente el tipo `int`. Si el índice está fuera del rango permitido, se produce un panic en tiempo de ejecución.
+* **Arrays:** `a[x]` representa el elemento en el índice `x` del array `a`. El comportamiento es el mismo tanto si se usa un array directamente como un puntero a un array
+* **Slices:** `a[x]` representa el elemento en el índice `x` del slice `a`
+* **Strings:** `a[x]` representa el byte en el índice `x` del string a. Para strings, el índice debe ser una constante, y el resultado no puede ser asignado (los strings son inmutables).
+
+**Para maps:**
+El índice `x` debe ser asignable al tipo de las claves del map. Si el map contiene `x` como clave, se devuelve el valor correspondiente. Si el map es `nil` o no contiene la clave, se devuelve el zero value del tipo de valores del map.
+
+**Para type parameters:**
+La index expression `a[x]` debe ser válida para todos los tipos del type set del type parameter. Esto significa que todos los tipos en el type set deben soportar la operación de indexado con el tipo de `x`.
+
+Para cualquier otro tipo que no sea array, slice, string, map o type parameter, el uso de index expressions no está permitido.
+
+### Slice expressions
+Las slice expressions construyen un substring o un slice (porción) a partir de un string, array, puntero a array o slice. Existen dos variantes: una forma simple que especifica un rango (inicio y fin), y una forma completa que también especifica la capacidad del slice resultante.
+
+Para type parameters, a menos que todo su type set contenga únicamente strings, el tipo de elemento de todos los tipos en el type set debe ser el mismo.
+
+#### Simple slice expressions
+Las simple slice expressions utilizan la sintaxis `a[low:high]` para especificar un rango de elementos. El índice inferior (`low`) es inclusivo, mientras que el índice superior (`high`) es exclusivo.
+
+Cualquiera de los dos índices puede ser omitido por conveniencia. Si se omite el índice inferior, toma el valor `0`. Si se omite el índice superior, toma el valor de la longitud del objeto (`len(object)`).
+
+Los índices deben ser enteros no negativos. Para strings y arrays, deben cumplir `0 <= low <= high <= len(object)`. Para slices, el índice superior puede extenderse hasta la capacidad del slice: `0 <= low <= high <= cap(slice)`.
+
+Si la slice expression es válida pero el objeto del cual se obtiene el slice es inválido, el resultado es `nil`. Todos los slices generados a partir del mismo objeto subyacente comparten el mismo array base.
+
+#### Full slice expressions
+Las full slice expressions utilizan la sintaxis `a[low:high:max]` y están disponibles para arrays, punteros a arrays y slices, pero no para strings. El tercer índice (`max`) controla la capacidad del slice resultante.
+
+Los índices `low` y `high` funcionan igual que en las simple slice expressions. El índice max establece que la capacidad del slice resultante será `max - low`. Solo el primer índice (`low`) puede ser omitido, tomando el valor `0`.
+
+Los índices deben cumplir `0 <= low <= high <= max <= cap(object)` y ser enteros no negativos.
+
+### Type assertions
+Una type assertion es una expresión de la forma `x.(T)` que verifica que `x` no es `nil` y que el valor almacenado en `x` es del tipo `T`. Esta operación solo es válida cuando `x` es de tipo interface.
+
+**Comportamiento según el tipo T:**
+* Si `T` no es un tipo interface, la type assertion verifica que el tipo dinámico de `x` sea idéntico a `T`.
+* Si `T` es un tipo interface, la type assertion verifica que el tipo dinámico de `x` implemente la interface `T`.
+
+Si la type assertion es válida, la expresión devuelve el valor almacenado en `x` convertido al tipo `T`. Si la assertion es inválida, se produce un panic en tiempo de ejecución. Para evitar el panic, se puede usar la forma de dos valores: `value, ok := x.(T)`. En esta variante, si la assertion es válida, `value` contiene el valor convertido y `ok` es `true`. Si la assertion es inválida, `value` es el zero value del tipo `T` y `ok` es `false`.
+
+### Calls
