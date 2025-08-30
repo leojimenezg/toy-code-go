@@ -1156,16 +1156,16 @@ A diferencia de las method expressions, los method values pueden crearse desde c
 ### Index expressions
 Una primary expression en la forma `a[x]` representa un elemento de un array, slice, string o map donde `x` es su índice o posición (para arrays, slices y strings), o clave (para maps).
 
-**Para arrays, slices y strings:**
+**Para arrays, slices y strings**
 El índice debe ser una constante sin tipo o un valor de tipo `int`. Debe ser un número no negativo representable por el tipo `int`, y debe estar en el rango `0 <= index < len(object)`. Una constante sin tipo usada como índice toma automáticamente el tipo `int`. Si el índice está fuera del rango permitido, se produce un panic en tiempo de ejecución.
 * **Arrays:** `a[x]` representa el elemento en el índice `x` del array `a`. El comportamiento es el mismo tanto si se usa un array directamente como un puntero a un array
 * **Slices:** `a[x]` representa el elemento en el índice `x` del slice `a`
 * **Strings:** `a[x]` representa el byte en el índice `x` del string a. Para strings, el índice debe ser una constante, y el resultado no puede ser asignado (los strings son inmutables).
 
-**Para maps:**
+**Para maps**
 El índice `x` debe ser asignable al tipo de las claves del map. Si el map contiene `x` como clave, se devuelve el valor correspondiente. Si el map es `nil` o no contiene la clave, se devuelve el zero value del tipo de valores del map.
 
-**Para type parameters:**
+**Para type parameters**
 La index expression `a[x]` debe ser válida para todos los tipos del type set del type parameter. Esto significa que todos los tipos en el type set deben soportar la operación de indexado con el tipo de `x`.
 
 Para cualquier otro tipo que no sea array, slice, string, map o type parameter, el uso de index expressions no está permitido.
@@ -1194,10 +1194,30 @@ Los índices deben cumplir `0 <= low <= high <= max <= cap(object)` y ser entero
 ### Type assertions
 Una type assertion es una expresión de la forma `x.(T)` que verifica que `x` no es `nil` y que el valor almacenado en `x` es del tipo `T`. Esta operación solo es válida cuando `x` es de tipo interface.
 
-**Comportamiento según el tipo T:**
+**Comportamiento según el tipo T**
 * Si `T` no es un tipo interface, la type assertion verifica que el tipo dinámico de `x` sea idéntico a `T`.
 * Si `T` es un tipo interface, la type assertion verifica que el tipo dinámico de `x` implemente la interface `T`.
 
 Si la type assertion es válida, la expresión devuelve el valor almacenado en `x` convertido al tipo `T`. Si la assertion es inválida, se produce un panic en tiempo de ejecución. Para evitar el panic, se puede usar la forma de dos valores: `value, ok := x.(T)`. En esta variante, si la assertion es válida, `value` contiene el valor convertido y `ok` es `true`. Si la assertion es inválida, `value` es el zero value del tipo `T` y `ok` es `false`.
 
 ### Calls
+Una call expression con la sintaxis `f(a1, a2, ..., an)` invoca a la función `f` con los argumentos especificados. Excepto en un caso especial, todos los argumentos deben ser asignables a los tipos de sus parámetros correspondientes.
+
+**Evaluación y orden de ejecución**
+Los argumentos son evaluados antes de realizar la llamada a la función. Durante la llamada, el valor de la función y sus argumentos se evalúan en orden normal. Posteriormente, se reserva espacio en memoria para las variables de la función (parámetros, valores de retorno y variables locales). Los argumentos se asignan a los parámetros correspondientes y comienza la ejecución de la función.
+
+**Diferencia entre métodos y funciones**
+Un método se invoca directamente desde un tipo o una instancia del mismo (por ejemplo, `obj.Method()` o `Type.Method()`), mientras que una función se llama de forma independiente o mediante un qualified identifier (por ejemplo, `fmt.Println()`).
+
+Llamar a una función nil produce un panic en tiempo de ejecución.
+
+Para funciones genéricas, deben ser instanciadas antes de poder ser llamadas o utilizadas como valores. Si el tipo de la función es un type parameter, todos los tipos en su type set deben tener el mismo tipo subyacente (tipo función).
+
+### Passing arguments to ... parameters
+Una función es variádica cuando su último (o único) parámetro tiene la forma `...T`, donde `T` es el tipo de los elementos. Dentro de la función, este parámetro se comporta como un slice de tipo `[]T`.
+
+Si no se pasan argumentos para el parámetro variádico, su valor es `nil`. Si se pasan uno o más argumentos, el parámetro recibe un slice cuyos elementos son los argumentos proporcionados. La longitud y capacidad de este slice corresponden exactamente al número de argumentos pasados.
+
+Cuando el argumento final en una llamada a una función variádica es un slice del tipo correspondiente seguido por `...`, ese slice se pasa directamente sin modificaciones. En este caso, no se crea un nuevo slice dentro de la función, por lo que tanto el caller como la función comparten el mismo array subyacente. Esta característica permite optimizar las llamadas variádicas cuando ya se tiene un slice disponible, evitando copias innecesarias de datos.
+
+### Instantiations
