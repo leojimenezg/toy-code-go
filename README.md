@@ -1221,3 +1221,36 @@ Si no se pasan argumentos para el parámetro variádico, su valor es `nil`. Si s
 Cuando el argumento final en una llamada a una función variádica es un slice del tipo correspondiente seguido por `...`, ese slice se pasa directamente sin modificaciones. En este caso, no se crea un nuevo slice dentro de la función, por lo que tanto el caller como la función comparten el mismo array subyacente. Esta característica permite optimizar las llamadas variádicas cuando ya se tiene un slice disponible, evitando copias innecesarias de datos.
 
 ### Instantiations
+Una función o tipo genérico es instanciado al sustituir los type parameters por type arguments específicos. Este proceso convierte una declaración genérica en una versión concreta no genérica.
+
+La instanciación se realiza en dos pasos secuenciales:
+1. **Sustitución:** Cada type argument reemplaza a su correspondiente type parameter en toda la declaración genérica. Esta sustitución ocurre en la función o tipo completo, incluyendo la lista de type parameters y cualquier referencia a tipos en la declaración
+2. **Verificación de constraints:** Después de la sustitución, cada type argument debe satisfacer las constraints del type parameter correspondiente. Si algún type argument no cumple con sus constraints, la instanciación falla
+
+Instanciar un tipo genérico resulta en un nuevo named type no genérico. Instanciar una función genérica produce una nueva función no genérica.
+
+Para funciones genéricas, los type arguments pueden especificarse explícitamente (recomendado) o pueden ser parcial o totalmente omitidos, cuando se omiten, Go realizará type inference basándose en el contexto de uso. Para tipos genéricos, los type arguments deben ser especificados explícitamente en todos los casos, pues Go no realiza type inference para la instanciación de tipos genéricos.
+
+### Type inference
+Al usar una función genérica, es posible omitir algunos o todos los type arguments siempre y cuando puedan ser inferidos desde el contexto de uso, considerando las constraints de los type parameters correspondientes.
+
+La inferencia de tipos funciona mediante las relaciones que existen entre pares de tipos. Un argumento debe ser asignable a su parámetro correspondiente, lo que crea una relación entre ambos tipos. Si alguno de estos tipos contiene type parameters, Go se asegura de que los type arguments sean asignables y satisfagan las constraints de su respectivo type parameter.
+
+Cada par de tipos correspondientes forma una *type equation* que contiene uno o múltiples type parameters de una o múltiples funciones genéricas. Los type parameters que necesitan ser resueltos (aquellos cuyos type arguments no fueron proporcionados explícitamente) se denominan *bound type parameters*. Un argumento puede contener otra función genérica, ampliando el conjunto de bound type parameters a resolver cuando sus type arguments tampoco se proporcionan.
+
+La inferencia de tipos prioriza la información obtenida directamente de los operandos antes que los valores específicos, y ocurre en dos fases:
+1. Las type equations se resuelven para los bound type parameters usando type unification. Este proceso identifica qué tipos deben tener los type parameters basándose en los argumentos proporcionados directamente. Si esta fase falla, la inferencia completa falla.
+2. Para cada bound type parameter que no pudo ser inferido en la primera fase, Go examina información adicional como tipos de retorno de funciones pasadas como argumentos, signatures completas de funciones, y constraints que puedan proporcionar pistas adicionales.
+
+Si después de ambas fases algunos type parameters no pueden inferirse, la inferencia falla y deben proporcionarse explícitamente.
+
+#### Type unification
+El proceso de type inference resuelve type equations mediante type unification. Type unification compara recursivamente los dos lados de una ecuación (LHS y RHS), donde uno o ambos tipos pueden ser o contener bound type parameters, y busca los type arguments correspondientes para hacer que ambos lados de la ecuación sean iguales.
+
+Para este proceso, Go mantiene un mapa que relaciona bound type parameters con sus type arguments inferidos. Este mapa se actualiza constantemente durante la unificación. Inicialmente, los bound type parameters son conocidos pero sus tipos no, por lo que el mapa está vacío. Durante el proceso, cuando se infiere un nuevo type argument, la relación correspondiente se agrega o actualiza en el mapa.
+
+La unificación utiliza una combinación de unificación exacta y unificación relajada, dependiendo de si ambos tipos deben ser idénticos o solo estructuralmente equivalentes.
+
+Resolver las type equations es un proceso iterativo. Resolver una ecuación puede llevar a inferir type arguments que permiten resolver otras ecuaciones. Por esta razón, type inference repite el proceso de type unification hasta que todos los type arguments hayan sido inferidos exitosamente.
+
+### Operands
