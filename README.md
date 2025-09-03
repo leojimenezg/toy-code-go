@@ -1253,4 +1253,71 @@ La unificación utiliza una combinación de unificación exacta y unificación r
 
 Resolver las type equations es un proceso iterativo. Resolver una ecuación puede llevar a inferir type arguments que permiten resolver otras ecuaciones. Por esta razón, type inference repite el proceso de type unification hasta que todos los type arguments hayan sido inferidos exitosamente.
 
-### Operands
+### Operators
+Los operadores combinan operandos (valores) para formar expresiones.
+
+Para operadores binarios (dos operandos), los tipos de los operandos generalmente deben ser idénticos, con algunas excepciones importantes:
+* **Constantes sin tipo:** Si un operando es una constante sin tipo y el otro sí tiene un tipo específico, la constante se convierte al tipo del operando tipado. Esta regla no se aplica a las operaciones de desplazamiento.
+* **Operaciones de desplazamiento:** En estas operaciones, el operando de lado derecho debe ser un entero o una constante representable por el tipo `uint`. Si el operando de lado izquierdo es una constante sin tipo, se convierte implícitamente al tipo que se asumiría como resultado de la operación de desplazamiento.
+
+#### Operators precedence
+Los operadores unarios (un operando) tienen la mayor precedencia. Los operadores del mismo nivel de precedencia se asocian de izquierda a derecha.
+
+Existen cinco niveles de precedencia para operadores binarios (dos operandos):
+
+| Nivel | Operador |
+|-------|----------|
+|   5   | `*`  `/`  `%` `<<` `>>` `&` `&^` |
+|   4   | `+` `-` `\|` `^` |
+|   3   | `==` `!=` `<` `<=` `>` `>=` |
+|   2   | `&&` |
+|   1   | `\|\|` |
+
+Los operadores con mayor precedencia se evalúan primero. Los paréntesis pueden usarse para alterar el orden de evaluación por defecto.
+
+### Arithmetic operators
+Los operadores aritméticos se aplican a valores numéricos y producen un resultado del mismo tipo que los operandos. Para la mayoría de operadores binarios (dos valores), ambos operandos deben ser del mismo tipo.
+
+| Operador | Descripción | Tipos |
+|----------|-------------|-------|
+| `+` | suma | integers, floats, complex values, strings |
+| `-` | resta | integers, floats, complex values |
+| `*` | multiplicación | integers, floats, complex values |
+| `/` | división | integers, floats, complex values |
+| `%` | residuo | integers |
+| `&` | AND bitwise | integers |
+| `\|` | OR bitwise | integers |
+| `^` | XOR bitwise | integers |
+| `&^` | bit clear (AND NOT) | integers |
+| `<<` | desplazamiento izquierdo | integer << unsigned integer |
+| `>>` | desplazamiento derecho | integer >> unsigned integer |
+
+Si un operando es de tipo type parameter, el operador debe ser aplicable a todos los tipos en el type set del type parameter. Los operandos se representan como valores del tipo concreto con el que el type parameter es instanciado, por lo que la operación se realiza con la precisión de dicho tipo concreto.
+
+#### Integer operators
+**División y módulo:** Para enteros, `/` y `%` están relacionados por la identidad `(a/b)*b + a%b == a` (excepto cuando `b == 0`). La división trunca hacia cero.
+
+**División por cero:** Dividir por cero causa un panic en tiempo de ejecución.
+
+**Operadores de desplazamiento (`<<`, `>>`):** El operando derecho debe ser unsigned o una constante no negativa. Si es una constante, debe ser menor que el ancho de bits del operando izquierdo.
+
+#### Integer overflow
+**Unsigned integers:** Cuando ocurre overflow, se descartan los bits que exceden la capacidad del tipo, implementando un comportamiento de "wrap around" donde el valor regresa al rango válido del tipo.
+
+**Signed integers:** El overflow puede ocurrir legalmente, pero el comportamiento específico depende de la implementación del compilador y la arquitectura.
+
+#### Floating-point operators
+**Operaciones básicas:** `+`, `-`, `*`, `/` siguen el estándar IEEE-754 para números de punto flotante.
+
+**División por cero:** `x/0.0` produce `+Inf` o `-Inf` (no panic como con enteros).
+
+**Valores especiales:** Las operaciones pueden producir `+Inf`, `-Inf`, o `NaN` (Not a Number).
+
+**FMA (Fused Multiply-Add):** Go puede usar instrucciones de hardware que calculan `x*y + z` como una operación atómica con mayor precisión, pero esto depende de la implementación.
+
+**Redondeo:** Sigue las reglas IEEE-754 para redondear al número representable más cercano.
+
+#### String concatenation
+Los strings se pueden concatenar usando el operador `+` o el operador de asignación `+=`. Estas operaciones siempre crean un nuevo string, ya que los strings en Go son inmutables.
+
+### Comparison operators
