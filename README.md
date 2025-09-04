@@ -1295,29 +1295,86 @@ Los operadores aritméticos se aplican a valores numéricos y producen un result
 Si un operando es de tipo type parameter, el operador debe ser aplicable a todos los tipos en el type set del type parameter. Los operandos se representan como valores del tipo concreto con el que el type parameter es instanciado, por lo que la operación se realiza con la precisión de dicho tipo concreto.
 
 #### Integer operators
-**División y módulo:** Para enteros, `/` y `%` están relacionados por la identidad `(a/b)*b + a%b == a` (excepto cuando `b == 0`). La división trunca hacia cero.
-
-**División por cero:** Dividir por cero causa un panic en tiempo de ejecución.
-
-**Operadores de desplazamiento (`<<`, `>>`):** El operando derecho debe ser unsigned o una constante no negativa. Si es una constante, debe ser menor que el ancho de bits del operando izquierdo.
+* **División y módulo:** Para enteros, `/` y `%` están relacionados por la identidad `(a/b)*b + a%b == a` (excepto cuando `b == 0`). La división trunca hacia cero.
+* **División por cero:** Dividir por cero causa un panic en tiempo de ejecución.
+* **Operadores de desplazamiento (`<<`, `>>`):** El operando derecho debe ser unsigned o una constante no negativa. Si es una constante, debe ser menor que el ancho de bits del operando izquierdo.
 
 #### Integer overflow
-**Unsigned integers:** Cuando ocurre overflow, se descartan los bits que exceden la capacidad del tipo, implementando un comportamiento de "wrap around" donde el valor regresa al rango válido del tipo.
-
-**Signed integers:** El overflow puede ocurrir legalmente, pero el comportamiento específico depende de la implementación del compilador y la arquitectura.
+* **Unsigned integers:** Cuando ocurre overflow, se descartan los bits que exceden la capacidad del tipo, implementando un comportamiento de "wrap around" donde el valor regresa al rango válido del tipo.
+* **Signed integers:** El overflow puede ocurrir legalmente, pero el comportamiento específico depende de la implementación del compilador y la arquitectura.
 
 #### Floating-point operators
-**Operaciones básicas:** `+`, `-`, `*`, `/` siguen el estándar IEEE-754 para números de punto flotante.
-
-**División por cero:** `x/0.0` produce `+Inf` o `-Inf` (no panic como con enteros).
-
-**Valores especiales:** Las operaciones pueden producir `+Inf`, `-Inf`, o `NaN` (Not a Number).
-
-**FMA (Fused Multiply-Add):** Go puede usar instrucciones de hardware que calculan `x*y + z` como una operación atómica con mayor precisión, pero esto depende de la implementación.
-
-**Redondeo:** Sigue las reglas IEEE-754 para redondear al número representable más cercano.
+* **Operaciones básicas:** `+`, `-`, `*`, `/` siguen el estándar IEEE-754 para números de punto flotante.
+* **División por cero:** `x/0.0` produce `+Inf` o `-Inf` (no panic como con enteros).
+* **Valores especiales:** Las operaciones pueden producir `+Inf`, `-Inf`, o `NaN` (Not a Number).
+* **FMA (Fused Multiply-Add):** Go puede usar instrucciones de hardware que calculan `x*y + z` como una operación atómica con mayor precisión, pero esto depende de la implementación.
+* **Redondeo:** Sigue las reglas IEEE-754 para redondear al número representable más cercano.
 
 #### String concatenation
 Los strings se pueden concatenar usando el operador `+` o el operador de asignación `+=`. Estas operaciones siempre crean un nuevo string, ya que los strings en Go son inmutables.
 
 ### Comparison operators
+Los operadores de comparación comparan dos operandos y producen un valor booleano sin tipo.
+
+| Operador | Descripción |
+|----------|-------------|
+| `==` | igual |
+| `!=` | no igual |
+| `<` | menor que |
+| `<=` | menor o igual que |
+| `>` | mayor que |
+| `>=` | mayor o igual que |
+
+En cualquier comparasión, el primer operando debe ser asignable al tipo del segundo operando, y vicevesrsa. Los operadores de igualdad (`==` y `!=`) se aplican a operandos comparables, mientras que los operadores de ordenamiento (`<`, `<=`, `>`, `>=`) se aplican a operandos ordenables.
+
+**Tipos comparable y ordenable:**
+* Integers
+* Floats
+* Strings
+
+**Solo comparable:**
+* Booleans
+* Complex values
+* Pointers
+* Channels
+
+**Comparable condicionalmente:**
+* Interfaces (si no son type parameters)
+* Structs (si todos sus campos son comparables)
+* Arrays (si sus elementos son comparables)
+* Type parameters (si son estrictamente comparables)
+
+**Casos especiales:**
+* Comparación con nil: Los tipos slice, map, function, pointer, channel e interface pueden compararse con nil.
+* Comparación de interfaces: Si dos valores de tipo interface tienen el mismo tipo dinámico pero ese tipo no es comparable, la comparación produce un panic en tiempo de ejecución.
+
+**Tipos no comparables entre sí:**
+* Slices
+* Maps
+* Functions
+
+**Comparaciones entre tipos diferentes:**
+* Un valor de tipo no-interface puede compararse con un valor de tipo interface si el tipo no-interface es comparable e implementa la interface.
+
+### Logical operators
+Los operadores lógicos aplican a valores de tipo booleano y devuelven un valor del mismo tipo de los operandos.
+
+| Operador | Descripción |
+|----------|-------------|
+| `&&` | AND condicional |
+| `\|\|` | OR condicional |
+| `!` | NOT |
+
+Estos operadores (`&&` y `||`) utilizan *short-circuit evaluation*, esto hace que si un lado de la condición no se cumpla la operación o sí se cumpla, el otro lado de la operación ya no se evalúa. Por ejemplo, para `&&` si el lado izquierdo es `false`, el lado derecho no se evalúa y el resultado es `false`; para `||` si el lado izquierdo es `true`, el lado derecho no se evalúa y el resultado es `true`.
+
+Además, cuando sí es necesario evaluar ambos lados de la operación, siempre se evalúa el lado izquierdo y luego el derecho.
+
+### Address operators
+Los address operators permiten trabajar con punteros y las direcciones de memoria donde se almacenan los valores.
+
+* **Operador de dirección (`&`):** Genera un puntero al operando especificado. El operando debe ser `addressable`, lo que significa que debe ser una variable, un pointer indirection, una operación de indexado de slice, un campo de struct addressable, o una operación de indexado de array addressable.
+* **Operador de indirección (`*`):** Realiza la desreferenciación de un puntero para obtener el valor almacenado en la dirección de memoria a la que apunta. Si se aplica a un puntero `nil`, la operación causa un panic en tiempo de ejecución.
+* **Addressabilidad:** No todos los valores son addressables. Por ejemplo, los literales, constantes, y los resultados de la mayoría de expresiones no son addressables. Solo se puede obtener la dirección de valores que tienen una ubicación específica en memoria.
+* **Relación entre operadores:** Estos operadores son inversos entre sí. Si `x` es `addressable`, entonces `*(&x)` es equivalente a `x`. Si `p` es un puntero válido, entonces `&(*p)` es equivalente a `p`.
+
+### Receive operator
