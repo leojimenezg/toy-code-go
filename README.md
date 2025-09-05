@@ -1378,3 +1378,47 @@ Los address operators permiten trabajar con punteros y las direcciones de memori
 * **Relación entre operadores:** Estos operadores son inversos entre sí. Si `x` es `addressable`, entonces `*(&x)` es equivalente a `x`. Si `p` es un puntero válido, entonces `&(*p)` es equivalente a `p`.
 
 ### Receive operator
+El operador de recepción `<-ch` recibe un valor del canal `ch`. El canal debe permitir operaciones de recepción, y el tipo del resultado es el tipo de elemento del canal. Esta expresión bloquea la goroutine actual hasta que un valor esté disponible en el canal. Recibir de un canal `nil` bloquea indefinidamente.
+
+Es posible recibir de un canal cerrado. En este caso, la operación retorna inmediatamente el zero value del tipo de elemento del canal. La expresión de recepción puede usarse en una asignación de dos valores: `value, ok := <-ch`. El segundo valor es un booleano sin tipo que indica si la recepción fue exitosa, `ok` es `true` si el valor fue enviado por una operación de envío exitosa, y `false` si es un zero value porque el canal está cerrado y vacío.
+
+Si el operando es un type parameter, todos los tipos en su type set deben ser tipos channel que permitan operaciones de recepción y tengan el mismo tipo de elemento.
+
+### Conversions
+Una conversión cambia el tipo de una expresión al tipo especificado. Las conversiones pueden aparecer directamente en la expresión (explícitas) o estar implícitas por el contexto en el que aparece la expresión.
+
+La conversión explícita tiene la forma `T(x)` donde `T` es el tipo y `x` es una expresión que puede ser convertida a dicho tipo. Si la expresión inicia con algún operador especial (`*`, `<-`) es necesario encerrar el operador y su operando entre paréntesis para evitar ambigüedades.
+
+Un valor constante puede ser convertido a un tipo si dicho valor puede ser representado por el tipo. Convertir una constante que no es un type parameter genera una constante tipada. Por el otro lado, convertir una constante que es un type parameter genera un valor no constante de dicho tipo representado por el tipo con el que fue instanciado el type parameter.
+
+Reglas para la conversión de un valor no constante:
+* `x` es asignable a `T`
+* `x` y `T` no son type parameters pero su tipo subyacente es idéntico
+* `x` y `T` son tipo puntero, no son named types y sus tipos base son idénticos
+* `x` y `T` son de tipo entero o punto flotante
+* `x` y `T` son de tipo complejo
+* `x` es de tipo entero o slice de bytes o runes y `T` es de tipo string
+* `x` es de tipo string y `T` de tipo slice de bytes o runes
+* `x` es de tipo slice, `T` es de tipo array o puntero a array y el tipo de sus elementos es idéntico
+
+Las conversiones específicas que aplican a valores no constantes de tipos numéricos o de tipo string pueden cambiar la representación de dicha variable y representar un costo extra en la ejecución. Todas las otras conversiones solo cambian el tipo pero no la representación de la variable.
+
+#### Conversions between numeric types
+Para conversiones de valores numéricos no constantes, se aplican las siguientes reglas:
+1. Al convertir entre tipos enteros, si el valor es un signed integer, se extiende el signo; de lo contrario, se extiende con ceros. Por lo tanto, la conversión siempre genera un valor válido sin indicación de overflow
+2. Al convertir floating-point a integer, la parte fraccionaria es descartada truncando hacia cero
+3. Al convertir integer o floating-point a floating-point, o de complex a otro tipo complex, el resultado es redondeado a la precisión del tipo destino
+
+En todas las conversiones no-constantes que involucren valores de tipo floating-point o complex, si el tipo del resultado no puede representar el valor, la conversión es exitosa pero el resultado dependerá de la implementación.
+
+#### Conversions to and from a string type
+1. Convertir un slice de bytes a un string genera un string cuyos bytes consecutivos son los elementos del slice
+2. Convertir un slice de runes a un string genera un string que es la concatenación de los valores rune individuales convertidos a string
+3. Convertir un string a slice de bytes genera un slice no-nil cuyos elementos consecutivos son los bytes utilizados para representar el string
+4. Convertir un string a slice de runes genera un slice que contiene los code-points Unicode individuales del string
+5. Por razones históricas, un integer puede ser convertido a string, generando un string que contiene la representación en UTF-8 del code-point Unicode correspondiente al integer. Es decir, el integer es tratado como un code-point Unicode
+
+#### Conversions from slice to array or array pointer
+Convertir un slice a un array genera un array que contiene los elementos del array subyacente del slice. De forma similar, convertir un slice a un puntero a array genera un puntero al array subyacente del slice. En ambos casos, si la longitud del slice es mayor a la longitud del array, ocurre un panic en tiempo de ejecución.
+
+### Constant expressions
