@@ -1422,3 +1422,19 @@ En todas las conversiones no-constantes que involucren valores de tipo floating-
 Convertir un slice a un array genera un array que contiene los elementos del array subyacente del slice. De forma similar, convertir un slice a un puntero a array genera un puntero al array subyacente del slice. En ambos casos, si la longitud del slice es mayor a la longitud del array, ocurre un panic en tiempo de ejecución.
 
 ### Constant expressions
+Las expresiones constantes solo pueden contener operandos constantes y son evaluadas en tiempo de compilación.
+
+Constantes booleanas, numéricas, y strings sin tipo pueden ser usadas como operandos donde sea permitido el uso de dichos tipos respectivamente.
+
+Una comparación de constantes siempre genera una constante booleana sin tipo. Si el operando izquierdo en una expresión de desplazamiento es una constante sin tipo, el resultado es una constante entera; de lo contrario, es una constante del mismo tipo que el operando izquierdo, el cual debe ser de tipo entero.
+
+Cualquier operación en constantes sin tipo resulta en una constante sin tipo que tiene la misma categoría. En operaciones binarias (dos operandos) con operandos sin tipo de diferentes categorías, el resultado toma la categoría del operando que aparece más tarde en esta lista siguiendo una jerarquía: integer, rune, floating-point, complex. Esto es con el objetivo de contener ambos operandos mantiendo una pérdida conceptual mínima.
+
+Las expresiones constantes siempre son evaluadas de forma exacta. Los valores intermedios y las propias constantes pueden requerir precisión significativamente mayor que cualquier tipo predefinido. Por lo tanto, las constantes mantienen una mayor precisión de representación que cualquier otro tipo predefinido en Go. Sin embargo, los valores de constantes siempre deben ser representables exactamente por el tipo al que se convierten.
+
+### Order of evaluation
+A nivel de paquete, las dependencias de inicialización (entre variables) determinan el orden de evaluación de las expresiones individuales de inicialización en declaraciones de variables. Sin embargo, al evaluar los operandos de una expresión, asignación o declaración de retorno, todos los operandos (llamadas a funciones, llamadas a métodos, operaciones de recepción de canales, y operaciones lógicas binarias) son evaluados en orden léxico de izquierda-a-derecha.
+
+Por lo tanto, dichas dependencias de inicialización pueden anular la regla de evaluación de izquierda-a-derecha para las inicializaciones a nivel de paquete, pero no pueden cambiar el orden de evaluación de los operandos dentro de cualquier expresión individual.
+
+## Statements
