@@ -1438,3 +1438,55 @@ A nivel de paquete, las dependencias de inicialización (entre variables) determ
 Por lo tanto, dichas dependencias de inicialización pueden anular la regla de evaluación de izquierda-a-derecha para las inicializaciones a nivel de paquete, pero no pueden cambiar el orden de evaluación de los operandos dentro de cualquier expresión individual.
 
 ## Statements
+Las sentencias son instrucciones completas que controlan la ejecución y son la forma más general del lenguaje, es decir, que las sentencias engloban prácticamente todos los demás elementos más específicos del lenguaje (expressions, declarations, etc.).
+
+### Terminating statements
+Una sentencia de terminación interrumpe el flujo de control regular dentro de un bloque. Es decir, que este tipo de sentencias no solo finalizan la ejecución de un bloque, sino que también controlan el flujo de ejecución, modificando el flujo procedimental en el que se presenta el código del bloque.
+
+Las siguientes son las sentencias de terminación en Go:
+1. La sentencia `return` o `goto`
+2. Llamar a la función integrada `panic`
+3. Un `block` en que su lista de sentencias termina con una sentencia de terminación
+4. La sentencia `if` en la que:
+    * la rama del `else` está presente
+    * ambas ramas (`if` y `else`) terminan con sentencias de terminación
+5. La sentencia `for` en la que:
+    * no hay sentencias `break` correspondientes al loop 
+    * no hay condición del loop
+    * no se usa la cláusula `range`
+6. La sentencia `switch` en la que:
+    * no hay sentencias `break` correspondientes a la estructura
+    * hay un caso default
+    * todos los casos, incluyendo el default, terminan con una sentencia de terminación
+7. La sentencia `select` en la que:
+    * no hay sentencias `break` correspondientes a la estructura
+    * hay un caso default
+    * todos los casos, incluyendo el default, terminan con una sentencia de terminación
+8. Las sentencias de etiqueta que terminan con una sentencia de terminación
+
+Todas las otras sentencias no son de terminación, por lo que no interrumpen ni modifican el flujo de control del bloque en que se encuentran. Una lista de sentencias termina con una sentencia de terminación si: la lista no está vacía, y su sentencia final es una sentencia de terminación.
+
+### Empty statements
+Las sentencias vacías no hacen nada y consisten únicamente en un punto y coma.
+
+### Labeled statements
+Las sentencias etiquetadas pueden ser los destinos de las sentencias `goto`, `break` o `continue`. Estas siguen la estructura: `Label:Stament`.
+
+### Expression statements
+Excepto las funciones built-in, las llamadas a funciones y métodos, y las operaciones de recepción de canales (`<-`) pueden ser usadas como sentencias.
+
+### Send statements
+Este tipo de sentencias son aquellas usadas para enviar valores a un canal.
+
+Para que estas sentencias sean válidas, el canal debe ser de tipo channel, debe permitir envío y el tipo del valor a enviar debe ser asignable al tipo del elemento del canal. Tanto la expresión del canal como el valor a enviar son evaluadas antes de que ocurra la comunicación.
+
+En el caso de canales sin buffer, se bloquea la ejecución hasta que ambos lados de la comunicación estén listos. Por lo tanto, enviar en un canal sin buffer ocurre si el valor será recibido; enviar en un canal con buffer ocurre si hay espacio en el buffer. Sin embargo, enviar a un canal cerrado causa un panic en tiempo de ejecución; y enviar a un canal `nil` bloquea indefinidamente.
+
+Además, si el tipo del canal es un type parameter, su type set debe contener solo tipos channel con la misma direccionalidad.
+
+### IncDec statements
+Las sentencias de incremento `++` y decremento `--` sirven para incrementar o decrementar su operando en uno, respectivamente.
+
+Para poder ser usadas, su operando debe ser un elemento del cual se pueda obtener su dirección (addressable) y los operadores deben aparecer después del operando.
+
+### Assignment statements
