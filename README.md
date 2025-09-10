@@ -1534,3 +1534,66 @@ Al igual que con las type assertions, `x` debe ser de tipo interface para poder 
 En estos switches, al menos un caso puede usar el valor `nil`. También, type parameters pueden ser usados en los cases; en este caso, se usa el tipo de la instanciación, y si un tipo se repite, se selecciona el primer case que coincida.
 
 ### For statements
+Las sentencias `for` especifican la ejecución repetitiva de un bloque. Existen tres formas de controlar las iteraciones: usando únicamente una condición, usando la forma completa del `for` o usando `range`.
+
+#### For statements with single condition
+Esta es la forma más simple de la sentencia; la condición se evalúa antes de cada iteración y si evalúa a `true` se ejecutará la iteración; de lo contrario, el loop finalizará. Si la condición está ausente, siempre se evaluará como `true`, lo que crearía un loop infinito.
+```go
+for a < b {
+    a = b * 2
+}
+```
+
+#### For statements with for clause
+Esta es la forma completa de la sentencia, también es controlada por una condición, pero adicionalmente puede especificar una sentencia inicial que se ejecuta antes de la primera iteración, y una sentencia post que se ejecuta después de cada iteración. La sentencia inicial puede ser una declaración corta de una variable. Las tres partes (inicial, condición, post) deben estar separadas por `;`.
+```go
+for i := 0; i < 10; i++ {
+    function(i)
+}
+```
+
+La sentencia inicial se ejecuta antes de evaluar la condición para la primera iteración, y la sentencia post se ejecuta después de que una iteración se haya completado. Cualquier elemento puede estar vacío, pero los `;` deben estar presentes.
+
+Cada iteración tiene sus propias variables declaradas. La variable de la primera iteración es declarada por la sentencia inicial. Las variables para las iteraciones siguientes son declaradas implícitamente antes de ejecutar la sentencia post y son inicializadas con el valor de la iteración anterior en ese momento.
+
+#### For statements with range clause
+La sentencia `for` junto con la cláusula `range` itera sobre todos los elementos de un array, slice, string, map, valores recibidos de un channel, valores enteros, o valores de una función que genera iteradores.
+```go
+for index, value := range array {
+    array[index] = value * 2
+}
+```
+
+La expresión a la derecha correspondiente a la cláusula range es llamada **range expression**, la cual puede ser un array, puntero a array, slice, string, map, channel, entero, o una función con cierta firma. Al igual que con las asignaciones, los operandos del lado izquierdo deben ser addressable y representan las variables de iteración. Si la range expression es una función, el número máximo de variables de iteración depende de la firma de la función. Si la range expression es un channel o entero, se permite máximo una variable de iteración.
+
+La range expression es evaluada una vez antes de comenzar el bucle, con una excepción: si hay solo una variable de iteración y tanto la range expression como su longitud son constantes, entonces la evaluación puede optimizarse.
+
+Las variables de iteración pueden ser declaradas usando declaración corta y pertenecen únicamente al scope del bloque `for`, manteniendo un valor único para cada iteración. Su tipo depende de los tipos correspondientes de la range expression. Si no se usa esta forma, las variables deben haber sido declaradas anteriormente.
+
+Si la range expression es un type parameter, todo su type set debe contener tipos del mismo tipo de datos compatibles con la cláusula range.
+
+### Go statements
+La sentencia `go` inicia la ejecución de una llamada a una función de forma concurrente dentro del mismo espacio de memoria. A esto se le conoce como **goroutines**.
+```go
+go function(args)
+```
+
+La expresión debe ser una llamada a una función o a un método y no puede estar entre paréntesis. Las llamadas a funciones built-in están restringidas a sentencias de expresiones únicamente.
+
+La función y sus argumentos son evaluados inmediatamente en la goroutine actual, pero, a diferencia de una llamada regular, el programa no espera a que la función termine para continuar su ejecución. Go gestiona cuándo iniciar la ejecución de la nueva goroutine. Cuando la función termina de ejecutarse, su goroutine también finaliza, y si la función tiene valores de retorno, estos son descartados.
+
+### Select statements
+La sentencia `select` elige un caso de un conjunto, cuyas expresiones son operaciones de envío o recepción usando canales. Esto es similar a un `switch` con la diferencia de que el caso que se elige es el que esté listo primero.
+
+Esta sentencia permite trabajar con operaciones de canales basándose en la operación que pueda ser realizada, evitando bloqueos de la goroutine actual. También, puede haber un caso `default`, que será elegido en caso de que ninguna operación de canal pueda ser realizada en ese momento.
+
+La ejecución de un select sucede en varios pasos:
+1. Evaluación: Para todos los casos en la sentencia, las expresiones de canal y los valores a enviar son evaluadas una vez, en el orden en que aparecen. El resultado es un conjunto de canales para recibir o enviar valores y sus valores correspondientes. Los side-effects de estas evaluaciones ocurren inmediatamente. Las variables del lado izquierdo (para recepción) aún no son evaluadas
+2. Selección: Si una o más operaciones pueden proceder, Go elige una de forma pseudoaleatoria. Si ninguna puede proceder, se elige el caso default si está presente; si no está presente, la ejecución se bloquea hasta que alguna operación pueda proceder
+3. Comunicación: A menos que el caso default haya sido seleccionado, la operación de comunicación seleccionada se ejecuta
+4. Asignación: Si hay variables en el lado izquierdo, se les asigna el valor resultante de la operación de comunicación
+5. Ejecución: El código del caso seleccionado es ejecutado
+
+Debido a que las operaciones en canales `nil` bloquean indefinidamente, un select con solo canales nil y sin caso default se bloquea indefinidamente.
+
+### Return statements
