@@ -1490,3 +1490,47 @@ Las sentencias de incremento `++` y decremento `--` sirven para incrementar o de
 Para poder ser usadas, su operando debe ser un elemento del cual se pueda obtener su dirección (addressable) y los operadores deben aparecer después del operando.
 
 ### Assignment statements
+Una asignación reemplaza el valor actual almacenado en una variable con un nuevo valor especificado por una expresión. Este tipo de sentencias puede asignar un único valor a una única variable o múltiples valores a múltiples variables.
+
+El lado izquierdo de cualquier operación de asignación debe ser un operando addressable, o ser el identificador en blanco (`_`). Los operandos del lado izquierdo pueden estar entre paréntesis.
+
+Una operación de asignación compuesta de tipo `x op=` y donde `op` es un operador binario es equivalente a `x = x op (y)` pero `x` se evalúa solo una vez. La parte `op=` es un único token. En este tipo de operaciones, tanto el lado izquierdo como el lado derecho deben contener exactamente una expresión que produzca un único valor, y el lado izquierdo no debe ser el identificador en blanco.
+
+Una asignación múltiple asigna los elementos individuales de una operación de múltiples valores a una lista de variables. Existen dos formas: la primera, la parte derecha de la operación es una expresión de múltiples valores como una función con varios valores de retorno; la segunda, el número de operandos en ambos lados es igual y cada valor forma un par con su variable correspondiente.
+
+El identificador en blanco (`_`) proporciona una forma de ignorar valores en una sentencia de asignación.
+
+La asignación ocurre en dos fases: primero, los operandos del lado izquierdo y las expresiones del lado derecho son evaluadas en el orden usual; segundo, las asignaciones se realizan de izquierda a derecha.
+
+Todos los valores deben ser asignables a las variables correspondientes, excepto en los siguientes casos:
+* Cualquier valor puede ser asignado al identificador en blanco
+* Si una constante sin tipo es asignada a una variable de tipo interface o al identificador en blanco, dicha constante primero es convertida a su tipo predeterminado
+* Si una constante booleana sin tipo es asignada a una variable de tipo interface o al identificador en blanco, primero es convertida al tipo `bool`
+
+Cuando un valor es asignado a una variable, solo el contenido almacenado en dicha variable es reemplazado. Si el valor contiene una referencia, la asignación copia la referencia pero no crea una copia de los datos referenciados.
+
+### If statements
+Las sentencias `if` especifican la ejecución condicional de dos ramas dependiendo del valor de una expresión booleana. Si la expresión se evalúa como `true`, se ejecuta la rama `if`; de lo contrario, si la rama `else` se encuentra presente, se ejecuta dicha rama.
+
+La expresión puede ser precedida por una sentencia de asignación simple, la cual se ejecuta antes de que la expresión de la condición sea evaluada.
+
+### Switch statements
+Las sentencias `switch` proporcionan ejecución de múltiples ramas, donde una expresión o tipo es comparado con cada uno de los `case` dentro de la sentencia para determinar qué rama ejecutar.
+
+Hay dos formas: **expression switches** y **type switches**. En la primera, los casos contienen expresiones que son comparadas con la expresión del switch; en la segunda, los casos contienen tipos que son comparados con el tipo de la expresión del switch.
+
+#### Expression switches
+En un expression switch, la expresión del switch es evaluada primero; luego, las expresiones de cada case, que no necesitan ser constantes, son evaluadas de izquierda-a-derecha y de arriba-hacia-abajo. El primer case cuya expresión sea igual a la expresión del switch será ejecutado y todos los otros casos son ignorados. Si ningún caso coincide, se ejecutará el caso `default`, si está presente, y puede estar en cualquier lugar del switch. Una expresión de switch ausente es tomada como el valor booleano `true`.
+
+Si la expresión del switch evalúa a una constante sin tipo, primero se convierte a su tipo predeterminado. El valor `nil` no puede ser usado como expresión del switch. El tipo de la expresión del switch debe ser comparable.
+
+La expresión del switch es tratada como si fuera el operando derecho de una comparación con cada expresión de case, y la expresión del switch puede ir precedida de una sentencia de asignación simple, la cual es ejecutada antes de que la expresión sea evaluada.
+
+#### Type switches
+En un type switch se comparan tipos en lugar de valores. Es similar a un expression switch, pero utiliza una expresión con una forma de type assertion (`x.(type)`) usando la palabra clave `type` en lugar de un tipo específico.
+
+Al igual que con las type assertions, `x` debe ser de tipo interface para poder obtener su tipo dinámico. Los cases contienen tipos y deben ser únicos.
+
+En estos switches, al menos un caso puede usar el valor `nil`. También, type parameters pueden ser usados en los cases; en este caso, se usa el tipo de la instanciación, y si un tipo se repite, se selecciona el primer case que coincida.
+
+### For statements
