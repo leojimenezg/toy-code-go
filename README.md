@@ -1597,3 +1597,52 @@ La ejecución de un select sucede en varios pasos:
 Debido a que las operaciones en canales `nil` bloquean indefinidamente, un select con solo canales nil y sin caso default se bloquea indefinidamente.
 
 ### Return statements
+La sentencia `return` solo puede ser usada dentro de una función, y esta finaliza la ejecución de la función donde sea usada, opcionalmente puede proveer uno o más resultados al lugar de la llamada a dicha función.
+
+Es importante mencionar que las funciones `defer` se ejecutan justo antes de que la función termine, ya sea por una sentencia return o al llegar al final de la función.
+
+Es posible usar return en una función que no devuelve ningún valor, pero la sentencia no debe especificar ningún valor de retorno, por lo que se usa únicamente para terminar la ejecución de la función anticipadamente.
+
+Hay tres formas de retornar valores desde una función:
+1. Los valores de retorno son explícitamente listados en la sentencia return, donde cada valor debe ser asignable al tipo de elemento correspondiente definido en la firma de la función
+2. La expresión en la lista de la sentencia return puede ser una llamada a otra función que retorne valores que coincidan con los tipos definidos en la firma de la función
+3. La lista de return puede estar vacía (bare return) cuando los parámetros de retorno están nombrados en la firma de la función. En este caso, se retornan automáticamente los valores actuales de esas variables nombradas
+
+Independientemente de cómo sean declarados los valores a retornar, todos son inicializados con sus zero values correspondientes inmediatamente después de entrar a la función. Una sentencia return que especifica valores explícitos asigna esos valores a los parámetros de retorno antes de ejecutar cualquier función defer.
+
+### Break statements
+La sentencia `break` finaliza la ejecución de la sentencia `for`, `switch` o `select más interna dentro de la misma función.
+
+Opcionalmente, break puede incluir un label que corresponda a una sentencia for, switch o select específica. En este caso, la ejecución terminará en esa sentencia etiquetada en lugar de la más interna.
+
+### Continue statements
+La sentencia `continue` finaliza la iteración actual y pasa a la siguiente iteración de la sentencia `for` más interna. Esto lo hace al transferir el control de flujo al final del bloque del loop, donde se evalúa la condición de continuación y se ejecuta la sentencia post (si existe).
+
+De igual forma que la sentencia `break`, puede incluir un label que corresponda a una sentencia for específica. En este caso, será ese loop etiquetado el que pase a su siguiente iteración, no necesariamente el más interno.
+
+### Goto statements
+La sentencia `goto` transfiere el control de flujo al punto donde se encuentra el `label` especificado, pero esto solo es posible dentro de la misma función.
+
+Es importante entender que la ejecución de goto no debe causar que se omita la declaración de alguna variable que esté en el scope del label de destino. En otras palabras, no se puede usar goto para saltar la declaración de una variable si esa variable sería visible en el punto de destino.
+
+Además, goto no puede transferir control a un label que esté dentro de un bloque al cual la sentencia goto no tiene acceso desde su posición actual.
+
+### Fallthrough statements
+La sentencia `fallthrough` transfiere el control de flujo al primer case inmediatamente siguiente dentro de una sentencia `expression switch`. Solo puede ser usada como la última sentencia en un case no vacío de un switch.
+
+Esta sentencia existe porque Go, a diferencia de lenguajes como C o Java, no tiene fallthrough automático en las sentencias switch. En Go, cada case termina automáticamente después de ejecutarse, por lo que fallthrough debe usarse explícitamente cuando se desea continuar al siguiente case.
+
+Es importante notar que fallthrough no evalúa la condición del siguiente case, simplemente ejecuta las sentencias del case siguiente incondicionalmente.
+
+### Defer statements
+La sentencia `defer` programa la ejecución de una función para que sea invocada únicamente cuando la función que la contiene está a punto de terminar. Esto puede ocurrir cuando la función completa normalmente su ejecución, ejecuta una sentencia `return`, o cuando la goroutine correspondiente entra en panic.
+
+La expresión debe ser únicamente una llamada a función o método, y no puede estar entre paréntesis. El uso de funciones built-in está restringido únicamente a `copy`, `delete`, `print`, `println` y `recover`.
+
+Cuando se ejecuta la sentencia defer, los argumentos de la función son evaluados inmediatamente, pero la función en sí no es invocada hasta que la función contenedora termine. Las funciones defer se ejecutan en orden LIFO (Last In, First Out), es decir, en orden inverso al que fueron declaradas.
+
+Es crucial entender que las funciones defer se ejecutan después de que la sentencia return haya asignado valores a los parámetros de retorno, pero antes de que la función termine completamente y retorne al caller. Esto permite que las funciones defer puedan leer y modificar los valores de retorno nombrados.
+
+Si la función especificada en defer evalúa a `nil`, ocurre un panic cuando dicha función es invocada, no cuando se evalúa la sentencia defer.
+
+## Built-in functions
