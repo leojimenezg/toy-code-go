@@ -1646,3 +1646,32 @@ Es crucial entender que las funciones defer se ejecutan después de que la sente
 Si la función especificada en defer evalúa a `nil`, ocurre un panic cuando dicha función es invocada, no cuando se evalúa la sentencia defer.
 
 ## Built-in functions
+Todas las funciones integradas en el lenguaje son predeclaradas. Dichas funciones no tienen un tipo estándar, por lo que solo pueden aparecer en expresiones de llamada y no pueden ser asignadas a variables o pasadas como valores a otras funciones. Se invocan como cualquier otra función, pero algunas de ellas pueden aceptar diferentes tipos como argumentos.
+
+### Appending to and copying slices
+Las funciones integradas `append` y `copy` permiten operaciones comunes en slices. El resultado de ambas funciones es independiente de si comparten el mismo espacio de memoria subyacente con los argumentos.
+
+La función variádica `append` agrega cero o más valores a un slice y devuelve el slice resultante del mismo tipo. Los valores adicionales son pasados al parámetro de tipo `...E`, donde `E` es el tipo de elemento del slice. Si la capacidad del slice no es suficiente para almacenar los nuevos elementos, `append` aloca un nuevo array subyacente con capacidad suficiente (generalmente el doble de la capacidad anterior) y copia todos los elementos existentes junto con los nuevos.
+
+La función `copy` copia elementos de un slice fuente a un slice destino y devuelve el número de elementos efectivamente copiados. Ambos slices deben tener tipos de elementos idénticos. La cantidad de elementos copiados corresponde al mínimo entre las longitudes de ambos slices.
+
+Para ambas funciones, cuando se usan con parámetros de tipo genéricos, todos los tipos en el type set deben tener el mismo tipo subyacente.
+
+### Clear
+La función integrada `clear` toma como argumento un map, slice o type parameter, y elimina todos sus elementos o los regresa a su zero value.
+
+Para maps, `clear` elimina todas las entradas, dejando el map vacío pero utilizando el mismo espacio de memoria subyacente. Para slices, `clear` establece todos los elementos a su zero value, pero mantiene la longitud original del slice.
+
+Si el argumento es un type parameter, todo su type set debe consistir únicamente de tipos map o slice, para que la función pueda operar independientemente del tipo concreto con el que se instancie el type parameter.
+
+Si el argumento es `nil`, la función no realiza ninguna operación (no-op).
+
+
+### Close
+La función integrada `close` sirve únicamente para canales, e indica que no se enviarán más valores a través de dicho canal. El canal debe permitir operaciones de envío (no puede ser un canal de solo recepción).
+
+Enviar valores a un canal cerrado, intentar cerrar un canal ya cerrado, o cerrar un canal `nil` provoca un runtime panic. Una vez que un canal ha sido cerrado y todos sus valores pendientes han sido recibidos, las operaciones de recepción del canal retornarán el zero value del tipo de elemento del canal sin bloquear las goroutines.
+
+Si el argumento es un type parameter, todo su type set debe consistir únicamente de tipos channel con la direccionalidad correcta (que permita envío), para que la función pueda operar independientemente del tipo concreto con el que se instancie el type parameter.
+
+### Manipulation complex numbers
