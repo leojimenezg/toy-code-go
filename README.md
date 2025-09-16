@@ -1674,4 +1674,40 @@ Enviar valores a un canal cerrado, intentar cerrar un canal ya cerrado, o cerrar
 
 Si el argumento es un type parameter, todo su type set debe consistir únicamente de tipos channel con la direccionalidad correcta (que permita envío), para que la función pueda operar independientemente del tipo concreto con el que se instancie el type parameter.
 
-### Manipulation complex numbers
+### Manipulating complex numbers
+Existen tres funciones integradas para trabajar con números complejos. La función `complex` construye un número complejo utilizando una parte real y una parte imaginaria de punto flotante; las funciones `real` e `imag` extraen respectivamente la parte real e imaginaria de un número complejo.
+
+Para `complex`, ambos argumentos deben ser del mismo tipo de punto flotante y el valor retornado corresponde al tipo complejo asociado: `complex64` para argumentos `float32`, o `complex128` para argumentos `float64`. Si uno de los argumentos es una constante sin tipo, se convierte implícitamente al tipo del otro argumento. Si ambos argumentos son constantes sin tipo, no deben ser números complejos y la parte imaginaria debe ser cero, en este caso, el valor retornado es una constante compleja sin tipo.
+
+Para `real` e `imag`, el argumento debe ser de tipo complejo y el valor retornado es del tipo de punto flotante correspondiente: `float32` para `complex64`, o `float64` para `complex128`. Si el argumento es una constante sin tipo, el valor retornado es una constante de punto flotante sin tipo.
+
+Estas funciones no admiten argumentos de type parameter.
+
+### Deletion of map elements
+La función integrada `delete` elimina el elemento correspondiente a la clave especificada dentro de un `map`. La clave debe ser asignable al tipo de clave definido para el map.
+
+Si el primer argumento es un type parameter, su type set debe contener únicamente tipos map, y todos esos tipos map deben tener el mismo tipo de clave.
+
+Si el map es `nil` o la clave no existe en el map, la función no realiza ninguna operación (no-op).
+
+### Length and capacity
+Las funciones integradas `len` y `cap` aceptan argumentos de diferentes tipos y siempre devuelven un resultado de tipo `int`.
+
+Si el argumento es un type parameter, el uso de la función correspondiente debe ser válido para todos los tipos en su type set, y el resultado corresponde a la longitud o capacidad del valor del tipo concreto utilizado al instanciar dicho type parameter.
+
+La longitud y capacidad tienen significados específicos según el tipo:
+**Length (`len`):**
+* **string:** número de bytes en la representación UTF-8 del string
+* **array:** número de elementos en el array (fijo en tiempo de compilación)
+* **slice:** número de elementos actualmente en el slice
+* **map:** número de pares clave-valor definidos
+* **channel:** número de elementos actualmente en el buffer del canal
+
+**Capacity (cap):**
+* **array:** número de elementos en el array (igual que `len` para arrays)
+* **slice:** número máximo de elementos que puede contener el array subyacente desde la posición actual
+* **channel:** capacidad máxima del buffer del canal
+
+Cuando los argumentos son constantes evaluables en tiempo de compilación, el resultado también es una constante y puede ser optimizado por el compilador.
+
+### Making slices, maps and channels
