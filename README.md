@@ -1711,3 +1711,42 @@ La longitud y capacidad tienen significados específicos según el tipo:
 Cuando los argumentos son constantes evaluables en tiempo de compilación, el resultado también es una constante y puede ser optimizado por el compilador.
 
 ### Making slices, maps and channels
+La función integrada `make` toma un tipo de `slice`, `map`, `channel` o type parameter, opcionalmente seguido por argumentos que especifican propiedades del objeto a crear. Esta función retorna un valor completamente inicializado del tipo especificado, donde la memoria subyacente es inicializada apropiadamente (zero value).
+
+**Slice:**
+* `make([]T, n)`: slice de tipo `[]T` con longitud `n` y capacidad `n`
+* `make([]T, n, m)`: slice de tipo `[]T` con longitud `n` y capacidad `m`
+
+**Map:**
+* `make(map[K]V)`: mapa vacío de tipo `map[K]V`
+* `make(map[K]V, n)`: mapa de tipo `map[K]V` con espacio preallocado para aproximadamente `n` elementos
+
+**Channel:**
+* `make(chan T)`: canal sin buffer de tipo chan `T` (síncrono)
+* `make(chan T, n)`: canal de tipo chan `T` con buffer de capacidad `n`
+
+**Type parameter:** Todo su type set debe contener únicamente tipos slice, map o channel que compartan el mismo tipo subyacente. Para channels, todos deben tener la misma direccionalidad.
+
+Los argumentos de tamaño (`n` y `m`) deben ser expresiones enteras no negativas representables como tipo `int`. Para slices, `n` no debe ser mayor que `m`.
+
+### Min and max
+Las funciones integradas `min` y `max` devuelven respectivamente el valor mínimo y máximo de un conjunto fijo de argumentos de tipos ordenables. Debe proporcionarse al menos un argumento.
+
+Para que los argumentos sean válidos, deben cumplir las mismas reglas que los operadores de comparación: todos los argumentos deben ser comparables entre sí, similar a como `x + y` debe ser válido para argumentos numéricos. Si todos los argumentos son constantes, el resultado también es una constante.
+
+Para argumentos numéricos enteros, estas funciones son conmutativas y asociativas, por lo que el orden de los argumentos no afecta el resultado.
+
+Para argumentos de punto flotante, existen reglas especiales para manejar casos como cero negativo (-0), NaN (Not a Number), e infinito, siguiendo el estándar IEEE 754. Estas reglas son intuitivas: NaN se propaga (si algún argumento es NaN, el resultado es NaN), y se respetan las comparaciones estándar para infinitos y ceros con signo.
+
+Para argumentos de tipo string, la comparación se realiza lexicográficamente byte por byte.
+
+Si el argumento es un type parameter, todos los tipos en su type set deben ser ordenables y comparables entre sí.
+
+### Allocation
+La función integrada `new` recibe como argumento un tipo y aloca memoria para un valor de ese tipo. Esta función retorna un puntero a la memoria asignada, donde el valor está inicializado con su zero value correspondiente.
+
+Es importante notar que `new` funciona con cualquier tipo, y siempre retorna un puntero al tipo especificado. Por ejemplo, `new(int)` retorna `*int`.
+
+La ubicación específica de la memoria (heap vs stack) es un detalle de implementación que el runtime de Go decide mediante escape analysis, no algo que el programador controla directamente.
+
+### Handling panics
