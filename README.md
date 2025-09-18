@@ -1750,3 +1750,25 @@ Es importante notar que `new` funciona con cualquier tipo, y siempre retorna un 
 La ubicación específica de la memoria (heap vs stack) es un detalle de implementación que el runtime de Go decide mediante escape analysis, no algo que el programador controla directamente.
 
 ### Handling panics
+Las funciones integradas `panic` y `recover` brindan asistencia para reportar y manejar errores en tiempo de ejecución (runtime panics) y condiciones excepcionales del programa.
+
+Cuando se ejecuta una función y ocurre una llamada explícita a `panic` o surge un runtime panic, la ejecución normal de esa función se detiene inmediatamente. Sin embargo, cualquier función `defer` previamente registrada se ejecuta normalmente. Este proceso continúa subiendo por la pila de llamadas: cada función en la cadena se detiene, pero sus `defer`s se ejecutan. Si ninguna función `defer` llama a `recover`, el programa eventualmente termina y reporta el error. Esta secuencia se conoce como *panicking*.
+
+La función `recover` permite a un programa interceptar y manejar el comportamiento de una *panicking goroutine*. Además, `recover` retorna el valor que fue pasado a `panic` cuando:
+* La goroutine está en estado *panicking*
+* `recover` es llamada directamente desde una función `defer`
+
+En cualquier otro caso (goroutine no está panicking, o recover no llamada desde defer), `recover` retorna `nil` y no tiene efecto.
+
+Es importante notar que llamar a `panic` con valor `nil` sí causa un runtime panic, pero `recover` puede detectarlo y retornará `nil` como valor recuperado.
+
+### Bootstraping
+Go provee algunas funciones integradas que son útiles durante el arranque o inicialización de un programa (bootstrapping). Aunque están documentadas para completitud, estas funciones no tienen garantía de compatibilidad y pueden cambiar o eliminarse en versiones futuras del lenguaje.
+
+Estas funciones no retornan ningún valor y están pensadas principalmente para depuración a bajo nivel o situaciones donde las facilidades normales de I/O no están disponibles:
+* `print`: imprime todos sus argumentos directamente a la salida estándar, concatenados sin separadores
+* `println`: imprime todos sus argumentos separados por espacios, con una nueva línea al final
+
+Es importante entender que estas funciones operan a un nivel más bajo que `fmt.Print` y `fmt.Println`, y su comportamiento específico puede depender de la implementación del runtime.
+
+## Packages
