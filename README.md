@@ -1772,3 +1772,26 @@ Estas funciones no retornan ningún valor y están pensadas principalmente para 
 Es importante entender que estas funciones operan a un nivel más bajo que `fmt.Print` y `fmt.Println`, y su comportamiento específico puede depender de la implementación del runtime.
 
 ## Packages
+Los programas de Go se construyen enlazando varios paquetes que trabajan en conjunto para formar un programa ejecutable. Un paquete se construye a partir de uno o más archivos de código fuente que juntos declaran constantes, variables, tipos, funciones y otros elementos de Go. Estos elementos son accesibles en todos los archivos del mismo paquete, y pueden ser accesibles desde otros paquetes si son exportados (comienzan con mayúscula).
+
+### Source file organization
+Cada archivo fuente debe contener:
+* **Package clause:** define a qué paquete pertenece el archivo
+* **Import declarations:** conjunto posiblemente vacío de declaraciones que especifican qué paquetes usar
+* **Top-level declarations:** conjunto posiblemente vacío de declaraciones de constantes, variables, tipos, funciones, etc.
+
+### Package clause
+La cláusula `package` debe aparecer al inicio de cada archivo fuente y define a qué paquete pertenece dicho archivo. El nombre del paquete no puede ser el identificador en blanco (`_`).
+
+Un conjunto de archivos que comparten el mismo nombre de paquete forman la implementación de ese paquete. Típicamente, todos los archivos de un paquete deben residir en el mismo directorio, aunque esto puede depender de la implementación del sistema de compilación.
+
+### Import declarations
+Una declaración `import` establece que el archivo contenedor depende de la funcionalidad del paquete importado, permitiendo el acceso a los identificadores exportados de dicho paquete. Cada declaración `import` especifica un identificador local (nombre del paquete) y un import path (ubicación del paquete).
+
+El identificador local se usa como *qualified identifier* para acceder a elementos exportados del paquete importado. Si el identificador se omite, se usa por defecto el nombre declarado en la cláusula `package` del paquete importado. Si se usa el identificador `.`, todos los identificadores exportados del paquete se importan al scope actual, eliminando la necesidad de *qualified identifiers*.
+
+La interpretación del import path depende de la implementación, pero típicamente representa una ruta que identifica únicamente al paquete, a menudo relacionada con repositorios de control de versiones.
+
+Una declaración `import` establece una dependencia del paquete importador hacia el importado. No está permitido que un paquete se importe directa o indirectamente a sí mismo (dependencias circulares). Para importar un paquete únicamente por sus efectos secundarios de inicialización, se puede usar el identificador en blanco `_`.
+
+## Program initialization and execution
