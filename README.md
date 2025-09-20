@@ -1795,3 +1795,63 @@ La interpretación del import path depende de la implementación, pero típicame
 Una declaración `import` establece una dependencia del paquete importador hacia el importado. No está permitido que un paquete se importe directa o indirectamente a sí mismo (dependencias circulares). Para importar un paquete únicamente por sus efectos secundarios de inicialización, se puede usar el identificador en blanco `_`.
 
 ## Program initialization and execution
+### The zero value
+Cuando se aloca memoria para una variable, ya sea mediante una declaración, el uso de `new`, composite literals o `make`, y no se proporciona inicialización explícita, la variable recibe automáticamente su zero value (valor cero).
+
+Cada tipo tiene su propio zero value específico:
+* Booleanos: `false`
+* Tipos numéricos enteros: `0`
+* Tipos numéricos de punto flotante: `0.0`
+* Tipos numéricos complejos: `0+0i`
+* Strings: `""` (string vacío)
+* Punteros: `nil`
+* Funciones: `nil`
+* Interfaces: `nil`
+* Slices: `nil`
+* Canales: `nil`
+* Mapas: `nil`
+
+Esta inicialización se aplica recursivamente, por ejemplo, cada elemento de un array, cada campo de un struct, y cada elemento de un tipo compuesto recibe su respectivo zero value. El zero value de un tipo compuesto no es `nil`, sino una instancia válida donde todos sus componentes tienen sus zero values correspondientes.
+
+Es importante entender que el zero value hace que todas las variables estén en un estado definido y usable inmediatamente después de su declaración, sin necesidad de inicialización explícita.
+
+### Package initialization
+Dentro de un paquete, la inicialización de variables a nivel de paquete ocurre paso a paso. En cada paso se selecciona la variable declarada más temprano que esté lista para inicialización (no tenga dependencias no resueltas).
+
+Una variable a nivel de paquete está lista para inicialización si:
+* No ha sido inicializada aún,
+* No tiene expresión de inicialización, o
+* Su expresión de inicialización no depende de variables aún no inicializadas
+
+Este proceso continúa hasta que no queden variables por inicializar. Si al finalizar quedan variables sin inicializar, significa que forman parte de un ciclo de dependencias, lo cual hace que el programa sea inválido.
+
+El orden de declaración de variables entre diferentes archivos del mismo paquete está determinado por el orden en que los archivos se presentan al compilador. Los sistemas de construcción deben presentar los archivos en orden lexicográfico por nombre para garantizar comportamiento reproducible.
+
+El análisis se basa únicamente en referencias léxicas (sintácticas) a identificadores, no en valores en tiempo de ejecución. Solo se consideran referencias a variables, funciones y métodos declarados en el mismo paquete, las referencias a otros paquetes no crean dependencias de inicialización.
+
+Las variables también pueden ser inicializadas mediante funciones `init` declaradas a nivel de paquete. Estas funciones:
+* No pueden tener parámetros ni valores de retorno
+* Se pueden declarar múltiples por paquete y por archivo
+* Solo pueden ser declaradas, no invocadas explícitamente
+* Se ejecutan después de que todas las variables estén inicializadas
+
+Un paquete se considera completamente inicializado cuando:
+* Todas sus variables a nivel de paquete tienen valores asignados
+* Todas las funciones init han sido ejecutadas en el orden que aparecen en el código fuente
+
+### Program initialization
+Los paquetes de un programa completo se inicializan paso a paso, un paquete a la vez. Si un paquete tiene importaciones, todos los paquetes importados se inicializan completamente antes que el paquete que los importa. Si un paquete es importado por múltiples paquetes, se inicializa exactamente una vez. Este diseño garantiza que no hay duplicación de inicialización ni ciclos de inicialización entre paquetes.
+
+La inicialización del programa completo ocurre en una sola goroutine, de manera secuencial. Aunque las funciones `init` pueden crear nuevas goroutines, el proceso de inicialización espera a que todas las funciones `init` del paquete actual terminen antes de continuar con el siguiente paquete.
+
+### Program execution
+Un programa ejecutable se crea enlazando un paquete especial llamado "main package" con todos los paquetes que importa directa o indirectamente. Este paquete debe:
+* Tener el nombre `main`
+* Declarar una función llamada `main` que no reciba parámetros ni retorne valores
+
+La ejecución del programa sigue esta secuencia:
+* Inicialización completa del programa: todos los paquetes se inicializan en orden de dependencias
+* Invocación de `main()`: se llama a la función `main` del paquete `main`
+* Terminación: cuando `main()` retorna, el programa termina inmediatamente sin esperar a que otras goroutines (no-main) finalicen
+
+## Errors
