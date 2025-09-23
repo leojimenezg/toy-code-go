@@ -1855,3 +1855,56 @@ La ejecución del programa sigue esta secuencia:
 * Terminación: cuando `main()` retorna, el programa termina inmediatamente sin esperar a que otras goroutines (no-main) finalicen
 
 ## Errors
+El tipo predeclarado `error` es una interfaz que representa la forma convencional de manejar condiciones de error en Go. Cualquier valor que implemente esta interfaz puede representar un error, donde `nil` indica ausencia de error y cualquier valor `no-nil` indica la presencia de un error.
+```go
+type error interface {
+    Error() string
+}
+```
+
+La interfaz `error` requiere únicamente un método `Error()` que retorne una representación `string` del error. Esta simplicidad permite que cualquier tipo pueda implementar la interfaz `error` definiendo este método.
+
+El diseño de Go favorece el manejo explícito de errores mediante valores de retorno, en lugar de excepciones. El patrón idiomático es retornar un error como último valor de retorno de una función, permitiendo al código llamador decidir cómo manejar cada condición de error.
+
+## Run-time panics
+Los errores que ocurren durante la ejecución del programa, como el uso de un índice fuera de los límites de un array o slice, desreferencia de un puntero nil, o división por cero, activan un *run-time panic*.
+
+Un *run-time panic* es equivalente a llamar explícitamente a la función `panic` con un valor que implementa la interfaz predeclarada `error`. Específicamente, estos panics generalmente contienen un valor de tipo que pertenece al paquete `runtime` (como `runtime.Error`) que describe la naturaleza del error de ejecución.
+
+Cuando ocurre un *run-time panic*, el programa sigue la misma secuencia que un panic explícito: la función actual se detiene, se ejecutan las funciones defer, y el panic se propaga hacia arriba en la pila de llamadas hasta que es recuperado con `recover` o el programa termine.
+
+## System considerations
+### Package unsafe
+El paquete `unsafe` es integrado y reconocido por el compilador. Proporciona facilidades para programación de bajo nivel, incluyendo operaciones que pueden violar el sistema de tipos de Go. Los paquetes que usen `unsafe` requieren gestión manual cuidadosa, ya que pueden no ser portables entre diferentes arquitecturas o versiones del compilador.
+
+Este paquete ofrece las siguientes interfaces:
+```go
+package unsafe
+type ArbitraryType int    // placeholder para cualquier tipo de Go; no es un tipo real
+type Pointer *ArbitraryType
+func Alignof(variable ArbitraryType) uintptr
+func Offsetof(selector ArbitraryType) uintptr
+func Sizeof(variable ArbitraryType) uintptr
+type IntegerType int      // placeholder para tipos enteros; no es un tipo real
+func Add(ptr Pointer, len IntegerType) Pointer
+func Slice(ptr *ArbitraryType, len IntegerType) []ArbitraryType
+func SliceData(slice []ArbitraryType) *ArbitraryType
+func String(ptr *byte, len IntegerType) string
+func StringData(str string) *byte
+```
+
+### Size and alignment guarantees
+Para tipos numéricos, Go garantiza los siguientes tamaños:
+* **1 byte:** `byte`, `uint8`, `int8`
+* **2 bytes:** `uint16`, `int16`
+* **4 bytes:** `uint32`, `int32`, `float32`
+* **8 bytes:** `uint64`, `int64`, `float64`, `complex64`
+* **16 bytes:** `complex128`
+
+Además, las garantías de alineación mínima son:
+* **Cualquier variable:** alineación mínima de 1 byte
+* **Variables de tipo struct:** alineación igual al mayor requerimiento de alineación de sus campos
+* **Variables de tipo array:** alineación igual a la alineación del tipo de sus elementos
+
+Estas garantías permiten escribir código que dependa de representaciones específicas de memoria cuando sea absolutamente necesario.
+
